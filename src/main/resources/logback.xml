@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Define properties -->
+    <property name="LOGS_DIR" value="logs"/>
+    <property name="APP_NAME" value="bookConnect"/>
+
+    <!-- ConsoleAppender for logging to the console -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- FileAppender with time-based rolling policy -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOGS_DIR}/${APP_NAME}.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_DIR}/${APP_NAME}.%i-%d{yyyy-MM-dd_HH-mm-ss}.log</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- Keep log files for 30 days -->
+            <totalSizeCap>1GB</totalSizeCap> <!-- Limit total size of all log files -->
+        </rollingPolicy>
+    </appender>
+
+    <!-- Root logger configuration -->
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

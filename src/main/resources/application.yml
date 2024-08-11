@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: BookConnect
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-request-size: 50MB
+      max-file-size: 50MB
+      enabled: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/book_connect
+    username: replace_me_username
+    password: replace_me_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+springdoc:
+  default-consumes-media-type: application/json
+  file:
+    upload:
+      photos-output-path: ./uploads
+
+logging:
+  level:
+    org.springframework: INFO

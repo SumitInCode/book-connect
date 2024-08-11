@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class JwtService {
     private static final long JWT_ACCESS_TOKEN_EXPIRATION_MS = 7200 * 1000L; // 2 hours in milliseconds
     private static final long JWT_REFRESH_TOKEN_EXPIRATION_MS = 864000000L; // 15 days in milliseconds
-    @Value("${jwt.secret.key}")
+    @Value("${user.config.jwt-secret-key}")
     private String JWT_SECRET_KEY;
 
     public String extractUsername(String token) {

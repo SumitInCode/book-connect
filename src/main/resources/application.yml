@@ -1,8 +1,6 @@
 spring:
   application:
     name: BookConnect
-  profiles:
-    active: dev
   servlet:
     multipart:
       max-request-size: 50MB
@@ -16,10 +14,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
     database-platform: org.hibernate.dialect.MySQLDialect
 springdoc:
   default-consumes-media-type: application/json
@@ -30,3 +24,7 @@ springdoc:
 logging:
   level:
     org.springframework: INFO
+
+user:
+  config:
+    jwt-secret-key:

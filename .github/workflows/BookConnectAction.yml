@@ -14,7 +14,10 @@ jobs:
       mysql:
         image: mysql:latest
         env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DATABASE_ROOT_PASSWORD }}
           MYSQL_DATABASE: book_connect
+          MYSQL_USER: ${{ secrets.DATABASE_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         ports:
           - 3306:3306
         options: --health-cmd "mysqladmin ping --silent" --health-interval 10s
@@ -38,7 +41,7 @@ jobs:
 
       - name: Creating test database and granting privileges
         run: |
-          mysql -h127.0.0.1 -uroot -p${{ secrets.DATABASE_ROOT_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
+          mysql -h127.0.0.1 -uroot -p${{ secrets.DATABASE_ROOT_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS book_connect;"
           mysql -h127.0.0.1 -uroot -p${{ secrets.DATABASE_ROOT_PASSWORD }} -e "CREATE USER IF NOT EXISTS '${{ secrets.DATABASE_USER }}'@'%' IDENTIFIED BY '${{ secrets.MYSQL_PASSWORD }}';"
           mysql -h127.0.0.1 -uroot -p${{ secrets.DATABASE_ROOT_PASSWORD }} -e "GRANT ALL PRIVILEGES ON book_connect.* TO '${{ secrets.DATABASE_USER }}'@'%';"
           mysql -h127.0.0.1 -uroot -p${{ secrets.DATABASE_ROOT_PASSWORD }} -e "FLUSH PRIVILEGES;"
@@ -48,5 +51,6 @@ jobs:
           sed -i 's/username: replace_me_username/username: ${{ secrets.DATABASE_USER }}/' src/main/resources/application.yml
           sed -i 's/password: replace_me_password/password: ${{ secrets.MYSQL_PASSWORD }}/' src/main/resources/application.yml
           sed -i '/jwt-secret-key:/ s/$/ ${{secrets.JWT_SECRET_KEY}}/' src/main/resources/application.yml
+
       - name: Building BookConnect
         run: mvn -B package --file pom.xml

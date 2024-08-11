@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,10 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private static final long JWT_EXPIRATION_MS = 7200 * 1000L; // 2 hours in milliseconds
-    private static final String JWT_SECRET_KEY = "G2e2s1I4b5J9xY8m0L3nW7qV4oR6pT1kkalhjgahgallghalZ9aF0dH3uV7wQ8r";
+    private static final long JWT_ACCESS_TOKEN_EXPIRATION_MS = 7200 * 1000L; // 2 hours in milliseconds
+    private static final long JWT_REFRESH_TOKEN_EXPIRATION_MS = 864000000L; // 15 days in milliseconds
+    @Value("${jwt.secret.key}")
+    private String JWT_SECRET_KEY;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -35,25 +38,25 @@ public class JwtService {
                 .getBody();
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateAccessToken(HashMap<String, Object> claims, UserDetails userDetails) {
+        return buildToken(claims, userDetails, JWT_ACCESS_TOKEN_EXPIRATION_MS);
     }
 
-    public String generateToken(HashMap<String, Object> claims, UserDetails userDetails) {
-        return buildToken(claims, userDetails);
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, JWT_REFRESH_TOKEN_EXPIRATION_MS);
     }
 
-    private String buildToken(HashMap<String, Object> extraclaims,
-                              UserDetails userDetails) {
+    private String buildToken(HashMap<String, Object> extraClaims,
+                              UserDetails userDetails, long expirationTime) {
          var authorities = userDetails.getAuthorities()
                  .stream()
                  .map(GrantedAuthority::getAuthority)
                  .toList();
          return Jwts.builder()
-                 .setClaims(extraclaims)
+                 .setClaims(extraClaims)
                  .setSubject(userDetails.getUsername())
                  .setIssuedAt(new Date(System.currentTimeMillis()))
-                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_MS ))
+                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime ))
                  .claim("authorities", authorities)
                  .signWith(getSignInKey())
                  .compact();

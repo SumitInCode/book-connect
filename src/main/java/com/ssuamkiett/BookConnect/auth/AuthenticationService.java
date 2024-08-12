@@ -1,16 +1,25 @@
 package com.ssuamkiett.BookConnect.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssuamkiett.BookConnect.exception.OperationNotPermittedException;
+import com.ssuamkiett.BookConnect.role.Role;
 import com.ssuamkiett.BookConnect.role.RoleRepository;
 import com.ssuamkiett.BookConnect.security.JwtService;
+import com.ssuamkiett.BookConnect.token.RefreshToken;
+import com.ssuamkiett.BookConnect.token.RefreshTokenRepository;
 import com.ssuamkiett.BookConnect.user.User;
 import com.ssuamkiett.BookConnect.user.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,7 +27,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
+    private static final int REFRESH_TOKEN_VALIDITY_DAYS = 10;
+
     private final RoleRepository roleRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
@@ -28,10 +40,64 @@ public class AuthenticationService {
         var userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("Role USER not initialized"));
         boolean isUserExists = userRepository.existsByEmail(request.getEmail());
-        if(isUserExists) {
+        if (isUserExists) {
             throw new OperationNotPermittedException("User already exists");
         }
-        User user = User.builder()
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new OperationNotPermittedException("User already exists");
+        }
+
+        User user = createUserFromRequest(request, userRole);
+        userRepository.save(user);
+    }
+
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        authenticateUser(request);
+
+        User user = (User) authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        ).getPrincipal();
+
+        String refreshToken = generateAndSaveRefreshToken(user);
+        String accessToken = jwtService.generateAccessToken(createClaims(user), user);
+
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        String refreshToken = authHeader.substring(7);
+        String userEmail = jwtService.extractUsername(refreshToken);
+
+        if (userEmail == null || !isValidToken(refreshToken, userEmail)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new OperationNotPermittedException("User not found"));
+
+        String accessToken = jwtService.generateAccessToken(createClaims(user), user);
+        AuthenticationResponse authResponse = AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+    }
+
+    private User createUserFromRequest(RegistrationRequest request, Role userRole) {
+        return User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
@@ -40,21 +106,40 @@ public class AuthenticationService {
                 .enabled(true)
                 .roles(List.of(userRole))
                 .build();
-
-        userRepository.save(user);
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        var auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(),
-                        request.getPassword())
+    private void authenticateUser(AuthenticationRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
+    }
+
+    private String generateAndSaveRefreshToken(User user) {
+        String refreshToken = jwtService.generateRefreshToken(user);
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByEmail(user.getEmail())
+                .orElseGet(() -> RefreshToken.builder()
+                        .email(user.getEmail())
+                        .build()
+                );
+
+        refreshTokenEntity.setToken(refreshToken);
+        refreshTokenEntity.setCreatedAt(LocalDateTime.now());
+        refreshTokenEntity.setExpiresAt(LocalDateTime.now().plusDays(REFRESH_TOKEN_VALIDITY_DAYS));
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        return refreshToken;
+    }
+
+    private HashMap<String, Object> createClaims(User user) {
         var claims = new HashMap<String, Object>();
-        var user = (User) auth.getPrincipal();
-        claims.put("fullName", user.fullName());
-        var token = jwtService.generateAccessToken(claims, user);
-        return AuthenticationResponse.builder()
-                .token(token)
-                .build();
+        claims.put("username", user.getUsername());
+        return claims;
+    }
+
+    private boolean isValidToken(String refreshToken, String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new OperationNotPermittedException("User not found"));
+
+        return jwtService.isValidToken(refreshToken, user);
     }
 }

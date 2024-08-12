@@ -16,12 +16,16 @@ public class RefreshToken {
     @Id
     @GeneratedValue
     private Integer id;
+    @Column(nullable = false, unique = true)
     private String token;
+    @Column(unique = true, nullable = false)
+    private String email;
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+    @Column(nullable = false)
     private LocalDateTime expiresAt;
-    private LocalDateTime validatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "userId", nullable = false)
+//    private User user;
 }

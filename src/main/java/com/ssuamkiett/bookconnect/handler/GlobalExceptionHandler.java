@@ -1,6 +1,7 @@
 package com.ssuamkiett.bookconnect.handler;
 
 import com.ssuamkiett.bookconnect.exception.OperationNotPermittedException;
+import io.jsonwebtoken.JwtException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -129,6 +130,18 @@ public class GlobalExceptionHandler {
                 .status(BAD_REQUEST)
                 .body(ExceptionResponse.builder()
                         .error(httpRequestMethodNotSupportedException.getMessage())
+                        .build()
+                );
+    }
+
+    @ExceptionHandler({JwtException.class})
+    public ResponseEntity<ExceptionResponse> handleException(
+            JwtException jwtException) {
+        logger.warn(jwtException.getMessage(), jwtException);
+        return ResponseEntity
+                .status(FORBIDDEN)
+                .body(ExceptionResponse.builder()
+                        .error("Invalid Token")
                         .build()
                 );
     }

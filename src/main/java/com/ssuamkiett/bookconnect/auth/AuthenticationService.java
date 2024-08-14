@@ -1,6 +1,6 @@
 package com.ssuamkiett.bookconnect.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.ssuamkiett.bookconnect.exception.OperationNotPermittedException;
 import com.ssuamkiett.bookconnect.role.Role;
 import com.ssuamkiett.bookconnect.role.RoleRepository;
@@ -9,8 +9,8 @@ import com.ssuamkiett.bookconnect.token.RefreshToken;
 import com.ssuamkiett.bookconnect.token.RefreshTokenRepository;
 import com.ssuamkiett.bookconnect.user.User;
 import com.ssuamkiett.bookconnect.user.UserRepository;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -68,32 +67,33 @@ public class AuthenticationService {
                 .build();
     }
 
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public AuthenticationResponse refreshToken(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+            throw new OperationNotPermittedException("Refresh token required");
         }
 
         String refreshToken = authHeader.substring(7);
-        String userEmail = jwtService.extractUsername(refreshToken);
-
-        if (userEmail == null || !isValidToken(refreshToken, userEmail)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+        String userEmail;
+        try {
+            userEmail = jwtService.extractUsername(refreshToken);
+            if (userEmail == null || !isValidToken(refreshToken, userEmail)) {
+                throw new OperationNotPermittedException("Invalid refresh token");
+            }
+        } catch (JwtException e) {
+            throw new OperationNotPermittedException("Error while validating token");
         }
 
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new OperationNotPermittedException("User not found"));
 
         String accessToken = jwtService.generateAccessToken(createClaims(user), user);
-        AuthenticationResponse authResponse = AuthenticationResponse.builder()
+
+        return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-
-        new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
     }
 
     private User createUserFromRequest(RegistrationRequest request, Role userRole) {

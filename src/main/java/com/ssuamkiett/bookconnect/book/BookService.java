@@ -31,8 +31,8 @@ public class BookService {
     private final FileService fileService;
     private final FileRepository fileRepository;
 
-    @Transactional
-    public Integer save(BookRequest bookRequest, MultipartFile coverPhoto, Authentication connectedUser) {
+
+    public BookResponse save(BookRequest bookRequest, MultipartFile coverPhoto, Authentication connectedUser) {
         if(coverPhoto.getSize() > MAX_FILE_SIZE) {
             throw new OperationNotPermittedException("File size should not exceed 1MB.");
         }
@@ -46,7 +46,10 @@ public class BookService {
         var bookCoverPhoto = fileService.saveFile(coverPhoto, user.getId());
         book.setOwner(user);
         book.setBookCover(bookCoverPhoto);
-        return bookRepository.save(book).getId();
+        Integer bookId = bookRepository.save(book).getId();
+        return BookResponse.builder()
+                .id(bookId)
+                .build();
     }
 
     public BookResponse findById(Integer bookId) {
@@ -128,7 +131,7 @@ public class BookService {
     }
 
     public Integer updateShareableStatus(Integer bookId, Authentication connectedUser) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
         if(!Objects.equals(book.getOwner().getId(), user.getId())) {
             throw new OperationNotPermittedException("You cannot updated book other shareable status");
@@ -139,7 +142,7 @@ public class BookService {
     }
 
     public Integer updateArchivedStatus(Integer bookId, Authentication connectedUser) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
         if(!Objects.equals(book.getOwner().getId(), user.getId())) {
             throw new OperationNotPermittedException("You cannot updated other book archived status");
@@ -175,7 +178,7 @@ public class BookService {
     }
 
     public Integer returnBorrowBook(Integer bookId, Authentication connectedUser) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        Book book = getBookFromDB(bookId);
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("The requested book cannot be returned");
         }
@@ -191,7 +194,7 @@ public class BookService {
     }
 
     public Integer approveReturnBorrowBook(Integer bookId, Authentication connectedUser) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        Book book = getBookFromDB(bookId);
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("The requested book cannot be returned");
         }
@@ -207,7 +210,7 @@ public class BookService {
     }
 
     public void uploadBookCoverPicture(Integer bookId, MultipartFile file, Authentication connectedUser) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
         var bookCover = fileService.saveFile(file, user.getId());
         book.setBookCover(bookCover);
@@ -216,7 +219,7 @@ public class BookService {
 
     @Transactional
     public void delete(Integer bookId, Authentication connectedUser) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
         if(!Objects.equals(book.getOwner().getId(), user.getId())) {
             throw new OperationNotPermittedException("Operation Not permitted to delete book");
@@ -226,5 +229,10 @@ public class BookService {
         if(isFileExists) {
             fileRepository.deleteById(bookId);
         }
+    }
+
+    private Book getBookFromDB(Integer bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
     }
 }

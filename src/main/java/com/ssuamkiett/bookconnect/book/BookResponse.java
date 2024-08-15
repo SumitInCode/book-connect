@@ -1,5 +1,6 @@
 package com.ssuamkiett.bookconnect.book;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookResponse {
     private Integer id;
     private String title;
@@ -17,7 +19,7 @@ public class BookResponse {
     private String synopsis;
     private String owner;
     private byte[] cover;
-    private double rate;
-    private boolean archived;
-    private boolean shareable;
+    private Double rate;
+    private Boolean archived;
+    private Boolean shareable;
 }

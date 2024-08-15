@@ -25,7 +25,7 @@ public class BookController {
     private final FileService fileService;
 
             @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Integer> saveBook(
+    public ResponseEntity<BookResponse> saveBook(
                                             @Valid @RequestPart("formData") BookRequest bookRequest,
                                             @NotNull @RequestPart("coverPhoto") MultipartFile coverPhoto,
                                             Authentication connectUser) {

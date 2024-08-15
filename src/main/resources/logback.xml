@@ -21,7 +21,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOGS_DIR}/${APP_NAME}.%i-%d{yyyy-MM-dd_HH-mm-ss}.log</fileNamePattern>
             <maxHistory>30</maxHistory> <!-- Keep log files for 30 days -->
-            <totalSizeCap>1GB</totalSizeCap> <!-- Limit total size of all log files -->
+            <totalSizeCap>10MB</totalSizeCap> <!-- Limit total size of all log files -->
         </rollingPolicy>
     </appender>
 

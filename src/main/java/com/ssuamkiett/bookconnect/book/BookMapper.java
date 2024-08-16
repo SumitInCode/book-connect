@@ -1,6 +1,6 @@
 package com.ssuamkiett.bookconnect.book;
 
-import com.ssuamkiett.bookconnect.file.FileUtils;
+import com.ssuamkiett.bookconnect.file.FileReadService;
 import com.ssuamkiett.bookconnect.history.BookTransactionHistory;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class BookMapper {
                 .archived(book.isArchived())
                 .shareable(book.isShareable())
                 .owner(book.getOwner().fullName())
-                .cover(FileUtils.readFileFormatLocation(book.getBookCover()))
+                .cover(FileReadService.readFileFormatLocation(book.getBookCover()))
                 .build();
 
     }

@@ -1,8 +1,9 @@
 package com.ssuamkiett.bookconnect.book;
 
 import com.ssuamkiett.bookconnect.exception.OperationNotPermittedException;
-import com.ssuamkiett.bookconnect.file.FileRepository;
+import com.ssuamkiett.bookconnect.file.FileReadService;
 import com.ssuamkiett.bookconnect.file.FileService;
+import com.ssuamkiett.bookconnect.file.FileType;
 import com.ssuamkiett.bookconnect.history.BookTransactionHistory;
 import com.ssuamkiett.bookconnect.history.BookTransactionHistoryRepository;
 import com.ssuamkiett.bookconnect.user.User;
@@ -29,8 +30,6 @@ public class BookService {
     private final BookMapper bookMapper;
     private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
     private final FileService fileService;
-    private final FileRepository fileRepository;
-
 
     public BookResponse save(BookRequest bookRequest, MultipartFile coverPhoto, Authentication connectedUser) {
         if(coverPhoto.getSize() > MAX_FILE_SIZE) {
@@ -43,10 +42,11 @@ public class BookService {
 
         User user = (User) connectedUser.getPrincipal();
         Book book = bookMapper.toBook(bookRequest);
-        var bookCoverPhoto = fileService.saveFile(coverPhoto, user.getId());
         book.setOwner(user);
-        book.setBookCover(bookCoverPhoto);
         Integer bookId = bookRepository.save(book).getId();
+        String coverPhotoPath = fileService.saveFile(coverPhoto, user.getId(), bookId, FileType.BOOK_COVER_PHOTO);
+        book.setBookCover(coverPhotoPath);
+        bookRepository.save(book);
         return BookResponse.builder()
                 .id(bookId)
                 .build();
@@ -153,7 +153,7 @@ public class BookService {
     }
 
     public Integer borrowBook(Integer bookId, Authentication connectedUser) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        Book book = getBookFromDB(bookId);
 
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("The requested book cannot be borrowed");
@@ -212,7 +212,7 @@ public class BookService {
     public void uploadBookCoverPicture(Integer bookId, MultipartFile file, Authentication connectedUser) {
         Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
-        var bookCover = fileService.saveFile(file, user.getId());
+        var bookCover = fileService.saveFile(file, user.getId(), bookId, FileType.BOOK_COVER_PHOTO);
         book.setBookCover(bookCover);
         bookRepository.save(book);
     }
@@ -225,14 +225,34 @@ public class BookService {
             throw new OperationNotPermittedException("Operation Not permitted to delete book");
         }
         bookRepository.delete(book);
-        boolean isFileExists = fileRepository.existsById(bookId);
-        if(isFileExists) {
-            fileRepository.deleteById(bookId);
-        }
     }
 
     private Book getBookFromDB(Integer bookId) {
         return bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+    }
+
+    public void uploadBookPDF(MultipartFile file, Integer bookId, Authentication connectedUser) {
+        Book book = getBookFromDB(bookId);
+        User user = (User) connectedUser.getPrincipal();
+        if(!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("Operation Not permitted!!");
+        }
+
+        String bookPDFFilePath = fileService.saveFile(file, user.getId(), bookId, FileType.BOOK_PDF);
+        book.setBookPDF(bookPDFFilePath);
+        bookRepository.save(book);
+    }
+
+    public byte[] getBookPDF(Integer bookId, Authentication connectedUser) {
+        Book book = getBookFromDB(bookId);
+        User user = (User) connectedUser.getPrincipal();
+        if(Objects.equals(book.getOwner().getId(), user.getId())) {
+            FileReadService.readFileFormatLocation(book.getBookPDF());
+        }
+        if(book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("Operation not permitted to retrieve book");
+        }
+        return FileReadService.readFileFormatLocation(book.getBookPDF());
     }
 }

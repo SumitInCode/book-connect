@@ -1,6 +1,6 @@
 package com.ssuamkiett.bookconnect.book;
 
-import com.ssuamkiett.bookconnect.file.FileService;
+
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -13,16 +13,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
-
 @RestController
 @RequestMapping("/api/v1/books")
 @RequiredArgsConstructor
 @Tag(name = "Book")
 public class BookController {
     private final BookService bookService;
-    private final FileService fileService;
 
             @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BookResponse> saveBook(
@@ -112,19 +108,21 @@ public class BookController {
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping(value = "/books/pdf/{bookId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/pdf/{bookId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile (
             @NotNull @PathVariable("bookId") Integer bookId,
-            @Parameter()
             @RequestPart("file") MultipartFile file,
-            Authentication connectedUser) throws IOException {
-        String uploadFile = fileService.uploadFileInDB(file, bookId, connectedUser);
-        return ResponseEntity.status(HttpStatus.OK).body(uploadFile);
+            Authentication connectedUser) {
+        bookService.uploadBookPDF(file, bookId, connectedUser);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/books/pdf/{bookId}")
     public ResponseEntity<?> getFile(@PathVariable("bookId") Integer bookId, Authentication connectedUser) {
-        byte[] file = fileService.getFileFromDB(bookId, connectedUser);
+        byte[] file = bookService.getBookPDF(bookId, connectedUser);
+        if(file == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.status(HttpStatus.OK).
                 contentType(MediaType.APPLICATION_PDF)
                 .body(file);

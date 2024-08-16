@@ -27,6 +27,9 @@ public class UserController {
     @GetMapping("/profile-pic")
     public ResponseEntity<?> getProfilePic(Authentication connectedUser) {
         byte[] file = userService.getProfilePicture(connectedUser);
+        if(file == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.status(HttpStatus.OK).
                 contentType(MediaType.APPLICATION_PDF)
                 .body(file);

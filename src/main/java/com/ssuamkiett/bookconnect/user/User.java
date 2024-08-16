@@ -44,9 +44,7 @@ public class User implements UserDetails, Principal {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastModifiedDate;
-    @Lob
-    @Column(length = 1000)
-    private byte[] profilePic;
+    private String profilePic;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
     @OneToMany(mappedBy = "owner")

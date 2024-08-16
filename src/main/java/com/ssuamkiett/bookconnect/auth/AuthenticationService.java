@@ -38,10 +38,6 @@ public class AuthenticationService {
     public void register(RegistrationRequest request) {
         var userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new IllegalStateException("Role USER not initialized"));
-        boolean isUserExists = userRepository.existsByEmail(request.getEmail());
-        if (isUserExists) {
-            throw new OperationNotPermittedException("User already exists");
-        }
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new OperationNotPermittedException("User already exists");

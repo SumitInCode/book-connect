@@ -1,11 +1,14 @@
 package com.ssuamkiett.bookconnect.book;
 
+import com.ssuamkiett.bookconnect.file.StorageService;
 import com.ssuamkiett.bookconnect.history.BookTransactionHistory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BookMapper {
-
+    private final StorageService storageService;
     public Book toBook(BookRequest bookRequest) {
         return Book.builder()
                 .title(bookRequest.title())
@@ -29,7 +32,7 @@ public class BookMapper {
                 .archived(book.isArchived())
                 .shareable(book.isShareable())
                 .owner(book.getOwner().fullName())
-                .cover(FileReadService.readFileFormatLocation(book.getBookCover()))
+                .cover(storageService.readFileFromLocation(book.getBookCover()))
                 .build();
 
     }

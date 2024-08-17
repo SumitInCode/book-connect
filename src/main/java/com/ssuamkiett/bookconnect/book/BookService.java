@@ -247,11 +247,11 @@ public class BookService {
         Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
         if(Objects.equals(book.getOwner().getId(), user.getId())) {
-            FileReadService.readFileFormatLocation(book.getBookPDF());
+            storageService.readFileFromLocation(book.getBookPDF());
         }
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("Operation not permitted to retrieve book");
         }
-        return FileReadService.readFileFormatLocation(book.getBookPDF());
+        return storageService.readFileFromLocation(book.getBookPDF());
     }
 }

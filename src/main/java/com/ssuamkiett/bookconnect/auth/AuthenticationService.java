@@ -48,7 +48,6 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticateUser(request);
 
         User user = (User) authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -102,12 +101,6 @@ public class AuthenticationService {
                 .enabled(true)
                 .roles(List.of(userRole))
                 .build();
-    }
-
-    private void authenticateUser(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
     }
 
     private String generateAndSaveRefreshToken(User user) {

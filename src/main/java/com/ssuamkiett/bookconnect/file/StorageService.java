@@ -1,5 +1,6 @@
 package com.ssuamkiett.bookconnect.file;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -10,13 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
 @RequiredArgsConstructor
-public class FileService {
-    private static final Logger logger = LoggerFactory.getLogger(FileService.class);
+public class StorageService {
+    private static final Logger logger = LoggerFactory.getLogger(StorageService.class);
 
     @Value("${springdoc.file.upload.photos-output-path}")
     private String fileUploadPath;
@@ -32,7 +34,7 @@ public class FileService {
         }
         String fileName = (fileType == FileType.BOOK_COVER_PHOTO) ? "cover_photo" : "bookPDF";
         Path bookTargetPath = bookSubPath.resolve(fileName + "." + fileExtension);
-        return saveFileToPath(sourceFile, bookTargetPath);
+        return writeFileToPath(sourceFile, bookTargetPath);
     }
 
     public String saveFile(@NonNull MultipartFile sourceFile, @NonNull Integer userId, @NonNull String userName) {
@@ -45,7 +47,7 @@ public class FileService {
             logger.warn("Error creating dir {}", userSubPath, exception);
         }
         Path userTargetPath = userSubPath.resolve(userName.toLowerCase() + "." + fileExtension);
-        return saveFileToPath(sourceFile, userTargetPath);
+        return writeFileToPath(sourceFile, userTargetPath);
     }
 
     private String getFileExtension(String fileName) {
@@ -59,13 +61,13 @@ public class FileService {
         return fileName.substring(lastDotIndex + 1);
     }
 
-    public void ensureDirExists(Path dirPath) throws IOException {
+    private void ensureDirExists(Path dirPath) throws IOException {
         if (Files.notExists(dirPath)) {
             Files.createDirectories(dirPath);
         }
     }
 
-    private String saveFileToPath(MultipartFile sourceFile, Path targetPath) {
+    private String writeFileToPath(MultipartFile sourceFile, Path targetPath) {
         try {
             Files.write(targetPath, sourceFile.getBytes());
             return targetPath.toString();
@@ -73,5 +75,23 @@ public class FileService {
             logger.warn("Could not save file to path: {}", targetPath, e);
             return null;
         }
+    }
+
+    public byte[] readFileFromLocation(String filePathString) {
+        if (StringUtils.isBlank(filePathString)) {
+            logger.warn("File path is blank or null.");
+            return null;
+        }
+        Path filePath = Paths.get(filePathString);
+        try {
+            return Files.readAllBytes(filePath);
+        }
+        catch (NoSuchFileException e) {
+            logger.warn("File not found: {}", filePathString, e);
+        }
+        catch (IOException e) {
+            logger.warn("Failed to read file: {}", filePathString, e);
+        }
+        return null;
     }
 }

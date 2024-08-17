@@ -1,8 +1,7 @@
 package com.ssuamkiett.bookconnect.book;
 
 import com.ssuamkiett.bookconnect.exception.OperationNotPermittedException;
-import com.ssuamkiett.bookconnect.file.FileReadService;
-import com.ssuamkiett.bookconnect.file.FileService;
+import com.ssuamkiett.bookconnect.file.StorageService;
 import com.ssuamkiett.bookconnect.file.FileType;
 import com.ssuamkiett.bookconnect.history.BookTransactionHistory;
 import com.ssuamkiett.bookconnect.history.BookTransactionHistoryRepository;
@@ -29,7 +28,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
-    private final FileService fileService;
+    private final StorageService storageService;
 
     public BookResponse save(BookRequest bookRequest, MultipartFile coverPhoto, Authentication connectedUser) {
         if(coverPhoto.getSize() > MAX_FILE_SIZE) {
@@ -44,7 +43,7 @@ public class BookService {
         Book book = bookMapper.toBook(bookRequest);
         book.setOwner(user);
         Integer bookId = bookRepository.save(book).getId();
-        String coverPhotoPath = fileService.saveFile(coverPhoto, user.getId(), bookId, FileType.BOOK_COVER_PHOTO);
+        String coverPhotoPath = storageService.saveFile(coverPhoto, user.getId(), bookId, FileType.BOOK_COVER_PHOTO);
         book.setBookCover(coverPhotoPath);
         bookRepository.save(book);
         return BookResponse.builder()
@@ -212,7 +211,7 @@ public class BookService {
     public void uploadBookCoverPicture(Integer bookId, MultipartFile file, Authentication connectedUser) {
         Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
-        var bookCover = fileService.saveFile(file, user.getId(), bookId, FileType.BOOK_COVER_PHOTO);
+        var bookCover = storageService.saveFile(file, user.getId(), bookId, FileType.BOOK_COVER_PHOTO);
         book.setBookCover(bookCover);
         bookRepository.save(book);
     }
@@ -239,7 +238,7 @@ public class BookService {
             throw new OperationNotPermittedException("Operation Not permitted!!");
         }
 
-        String bookPDFFilePath = fileService.saveFile(file, user.getId(), bookId, FileType.BOOK_PDF);
+        String bookPDFFilePath = storageService.saveFile(file, user.getId(), bookId, FileType.BOOK_PDF);
         book.setBookPDF(bookPDFFilePath);
         bookRepository.save(book);
     }

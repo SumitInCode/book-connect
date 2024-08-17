@@ -1,6 +1,5 @@
 package com.ssuamkiett.bookconnect.book;
 
-import com.ssuamkiett.bookconnect.file.FileReadService;
 import com.ssuamkiett.bookconnect.history.BookTransactionHistory;
 import org.springframework.stereotype.Service;
 

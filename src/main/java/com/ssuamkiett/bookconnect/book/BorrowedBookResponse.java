@@ -15,7 +15,6 @@ public class BorrowedBookResponse {
     private String authorName;
     private String isbn;
     private double rate;
-    private String description;
     private boolean returned;
     private boolean returnApproved;
 }

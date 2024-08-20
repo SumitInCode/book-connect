@@ -25,7 +25,6 @@ public class Book extends BaseEntity {
     private String authorName;
     private String isbn;
     private String synopsis;
-    private String description;
     private String bookCover;
     private String bookPDF;
     private boolean archived;

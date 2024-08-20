@@ -13,7 +13,6 @@ public class BookMapper {
                 .authorName(bookRequest.authorName())
                 .isbn(bookRequest.isbn())
                 .synopsis(bookRequest.synopsis())
-                .description(bookRequest.description())
                 .archived(false)
                 .shareable(bookRequest.shareable())
                 .build();
@@ -27,7 +26,6 @@ public class BookMapper {
                 .authorName(book.getAuthorName())
                 .isbn(book.getIsbn())
                 .synopsis(book.getSynopsis())
-                .description(book.getDescription())
                 .rate(book.getRate())
                 .archived(book.isArchived())
                 .shareable(book.isShareable())
@@ -43,7 +41,6 @@ public class BookMapper {
                 .title(bookTransactionHistory.getBook().getTitle())
                 .isbn(bookTransactionHistory.getBook().getIsbn())
                 .rate(bookTransactionHistory.getBook().getRate())
-                .description(bookTransactionHistory.getBook().getDescription())
                 .returned(bookTransactionHistory.isReturned())
                 .returnApproved(bookTransactionHistory.isReturnApproved())
                 .build();

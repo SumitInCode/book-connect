@@ -30,6 +30,7 @@ public class BookMapper {
                 .archived(book.isArchived())
                 .shareable(book.isShareable())
                 .owner(book.getOwner().fullName())
+                .coverPhoto(book.getBookCover())
                 .build();
 
     }

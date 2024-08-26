@@ -37,7 +37,7 @@ public class BookController {
     @GetMapping("/{book-id}")
     public ResponseEntity<BookResponse> findBookById(@PathVariable("book-id") Integer bookId) {
         return ResponseEntity.ok(bookService.findById(bookId));
-    }                       
+    }
 
     @GetMapping
     public ResponseEntity<PageResponse<BookResponse>> findAllBooks(
@@ -51,8 +51,8 @@ public class BookController {
     public ResponseEntity<PageResponse<BookResponse>> findAllBooksByTitle(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size,
-            @RequestParam(name = "title") String title) {
-        return ResponseEntity.ok(bookService.findAllBooksByTitle(page, size, title));
+            @RequestParam(name = "query") String searchQuery) {
+        return ResponseEntity.ok(bookService.findAllBooksByTitle(page, size, searchQuery));
     }
 
     @GetMapping("/owner")

@@ -276,8 +276,8 @@ public class BookService {
         return storageService.readFileFromLocation(book.getBookPDF());
     }
 
-    public PageResponse<BookResponse> findAllBooksByTitle(int page, int size, String title) {
-        Specification<Book> specification = hasKeywordInTitle(title).and(isNotArchived()).and(isSharable());
+    public PageResponse<BookResponse> findAllBooksByTitle(int page, int size, String searchQuery) {
+        Specification<Book> specification = hasKeywordInTitle(searchQuery).and(isNotArchived()).and(isSharable());
         Pageable pageable = PageRequest.of(page, size, Sort.by("creationDate").descending());
         Page<Book> books = bookRepository.findAll(specification, pageable);
         List<BookResponse> bookResponse = books.stream()

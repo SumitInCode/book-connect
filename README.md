@@ -26,3 +26,13 @@ cd BookConnect
 ```bash
 mvn spring-boot:run
 ```
+
+### 3. Run the BookConnect UI
+
+```bash
+cd bookconnect-ui
+npm install    // Install the necessary dependencies:
+npm run start 
+```
+
+ ### Note: The UI currently does not have full basic functionality.

@@ -1,0 +1,79 @@
+/* SearchForm.css */
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 500px; /* Adjust max-width as needed */
+  border: 1px solid #ccc; /* Slightly lighter border */
+  border-radius: 30px; /* Rounded corners for search box */
+  background-color: #fff;
+  overflow: hidden; 
+}
+
+.search-box input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 30px 0 0 30px; /* Rounded left corners */
+  font-size: 16px;
+  outline: none;
+}
+
+.search-box .search-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 49px;
+  background-color: #4481eb;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  font-size: 1.2rem; /* Ensure this matches the nav-link font size */
+  width: 7rem;
+  height: 49px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+}
+@media (max-width: 768px) {
+  .search-box {
+    max-width: 400px;
+  }
+
+  .search-box input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .search-box .search-button {
+    padding: 0 16px; /* Adjust horizontal padding */
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-box {
+    max-width: 330px;
+  }
+
+  .search-box input {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .search-box .search-button {
+    padding: 0 12px; /* Adjust horizontal padding */
+    font-size: 12px;
+  }
+}

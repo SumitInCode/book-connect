@@ -62,7 +62,7 @@ public class BookService {
 
         User user = (User) connectedUser.getPrincipal();
         if(Objects.equals(book.getOwner().getId(), user.getId())) {
-            return bookMapper.toBookResponse(book);
+            return bookMapper.toBookResponseWithOwner(book);
         }
 
         if(book.isArchived() || !book.isShareable()) {

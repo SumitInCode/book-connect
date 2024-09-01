@@ -19,6 +19,8 @@ public class BookResponse {
     private String synopsis;
     private String owner;
     private String coverPhoto;
+    private String genre;
+    private Boolean isOwner;
     private Double rate;
     private Boolean archived;
     private Boolean shareable;

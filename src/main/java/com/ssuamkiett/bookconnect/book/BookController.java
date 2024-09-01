@@ -22,7 +22,7 @@ public class BookController {
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BookResponse> saveBook(
-            @Valid @RequestPart("formData") BookRequest bookRequest,
+            @Valid @RequestPart("body") BookRequest bookRequest,
             @NotNull @RequestPart("coverPhoto") MultipartFile coverPhoto,
             Authentication connectUser) {
         return ResponseEntity.ok(bookService.save(bookRequest, coverPhoto, connectUser));
@@ -116,7 +116,7 @@ public class BookController {
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping(value = "/pdf/{bookId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/book-file/{bookId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(
             @NotNull @PathVariable("bookId") Integer bookId,
             @RequestPart("file") MultipartFile file,
@@ -125,9 +125,9 @@ public class BookController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/pdf/{bookId}")
+    @GetMapping("/book-file/{bookId}")
     public ResponseEntity<?> getFile(@PathVariable("bookId") Integer bookId, Authentication connectedUser) {
-        byte[] file = bookService.getBookPDF(bookId, connectedUser);
+                            byte[] file = bookService.getBookPDF(bookId, connectedUser);
         if (file == null) {
             return ResponseEntity.notFound().build();
         }

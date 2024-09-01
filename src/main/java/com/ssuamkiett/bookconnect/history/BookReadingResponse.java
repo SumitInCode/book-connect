@@ -1,4 +1,4 @@
-package com.ssuamkiett.bookconnect.book;
+package com.ssuamkiett.bookconnect.history;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BorrowedBookResponse {
+public class BookReadingResponse {
     private Integer id;
     private String title;
     private String authorName;

@@ -2,7 +2,6 @@ package com.ssuamkiett.bookconnect.book;
 
 import com.ssuamkiett.bookconnect.common.BaseEntity;
 import com.ssuamkiett.bookconnect.feeback.Feedback;
-import com.ssuamkiett.bookconnect.history.BookTransactionHistory;
 import com.ssuamkiett.bookconnect.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,9 +34,7 @@ public class Book extends BaseEntity {
     private User owner;
     @OneToMany(mappedBy = "book")
     private List<Feedback> feedbacks;
-    @OneToMany(mappedBy = "book")
-    private List<BookTransactionHistory> histories;
-
+    
     @Transient
     public double getRate() {
         if(feedbacks == null || feedbacks.isEmpty()) {

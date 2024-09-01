@@ -4,6 +4,7 @@ import com.ssuamkiett.bookconnect.book.Book;
 import com.ssuamkiett.bookconnect.common.BaseEntity;
 import com.ssuamkiett.bookconnect.user.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -12,20 +13,20 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class BookTransactionHistory extends BaseEntity {
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+public class BookReadingHistory extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @ManyToOne
-    @JoinColumn(name = "book_id")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
-    private boolean returned;
-    private boolean returnApproved;
 }
+    

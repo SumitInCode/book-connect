@@ -1,7 +1,8 @@
 package com.ssuamkiett.bookconnect.book;
 
 import com.ssuamkiett.bookconnect.file.StorageService;
-import com.ssuamkiett.bookconnect.history.BookTransactionHistory;
+import com.ssuamkiett.bookconnect.history.BookReadingHistory;
+import com.ssuamkiett.bookconnect.history.BookReadingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,16 +47,14 @@ public class BookMapper {
         return bookResponse;
     }
 
-    public BorrowedBookResponse toBorrowedBooksResponse(BookTransactionHistory bookTransactionHistory) {
-        return BorrowedBookResponse.builder()
+    public BookReadingResponse toReadingBookResponse(BookReadingHistory bookTransactionHistory) {
+        return BookReadingResponse.builder()
                 .id(bookTransactionHistory.getBook().getId())
                 .authorName(bookTransactionHistory.getBook().getAuthorName())
                 .title(bookTransactionHistory.getBook().getTitle())
                 .isbn(bookTransactionHistory.getBook().getIsbn())
                 .genre(bookTransactionHistory.getBook().getGenre())
                 .rate(bookTransactionHistory.getBook().getRate())
-                .returned(bookTransactionHistory.isReturned())
-                .returnApproved(bookTransactionHistory.isReturnApproved())
                 .build();
     }
 }

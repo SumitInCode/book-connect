@@ -3,8 +3,8 @@ package com.ssuamkiett.bookconnect.book;
 import com.ssuamkiett.bookconnect.exception.OperationNotPermittedException;
 import com.ssuamkiett.bookconnect.file.StorageService;
 import com.ssuamkiett.bookconnect.file.FileType;
-import com.ssuamkiett.bookconnect.history.BookTransactionHistory;
-import com.ssuamkiett.bookconnect.history.BookTransactionHistoryRepository;
+import com.ssuamkiett.bookconnect.history.BookReadingHistoryService;
+import com.ssuamkiett.bookconnect.history.BookReadingResponse;
 import com.ssuamkiett.bookconnect.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -29,7 +29,7 @@ import static com.ssuamkiett.bookconnect.book.BookSpecification.*;
 public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
-    private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
+    private final BookReadingHistoryService bookReadingHistoryService;
     private final StorageService storageService;
 
     public BookResponse save(BookRequest bookRequest, MultipartFile coverPhoto, Authentication connectedUser) {
@@ -57,7 +57,7 @@ public class BookService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
         if(connectedUser == null) {
-            return findById(bookId, book);
+            return findById(book);
         }
 
         User user = (User) connectedUser.getPrincipal();
@@ -72,7 +72,7 @@ public class BookService {
         return bookMapper.toBookResponse(book);
     }
 
-    private BookResponse findById(Integer bookId, Book book) {
+    private BookResponse findById(Book book) {
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("Operation not permitted!");
         }
@@ -133,42 +133,26 @@ public class BookService {
                 books.isLast()
         );
     }
-
-    public PageResponse<BorrowedBookResponse> findAllBorrowedBooks(int page, int size, Authentication connectedUser) {
+    public void addReadBook(Integer bookId, Authentication connectedUser) {
+        Book book = getBookFromDB(bookId);
+        if(book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("Operation not permitted to retrieve book");
+        }
         User user = (User) connectedUser.getPrincipal();
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<BookTransactionHistory> allBorrowedBooks = bookTransactionHistoryRepository.findAllBorrowedBooks(pageable, user.getId());
-        List<BorrowedBookResponse> bookResponse = allBorrowedBooks.stream()
-                .map(bookMapper::toBorrowedBooksResponse)
-                .toList();
-        return new PageResponse<>(
-                bookResponse,
-                allBorrowedBooks.getNumber(),
-                allBorrowedBooks.getSize(),
-                allBorrowedBooks.getTotalElements(),
-                allBorrowedBooks.getTotalPages(),
-                allBorrowedBooks.isFirst(),
-                allBorrowedBooks.isLast()
-        );
+        bookReadingHistoryService.addBookToReading(user, book);
     }
 
-    public PageResponse<BorrowedBookResponse> findAllReturnedBooks(int page, int size, Authentication connectedUser) {
+    public PageResponse<BookReadingResponse> findAllReadingBooks(int page, int size, Authentication connectedUser) {
         User user = (User) connectedUser.getPrincipal();
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
-        Page<BookTransactionHistory> allBorrowedBooks = bookTransactionHistoryRepository.findAllReturnedBooks(pageable, user.getId());
-        List<BorrowedBookResponse> bookResponse = allBorrowedBooks.stream()
-                .map(bookMapper::toBorrowedBooksResponse)
-                .toList();
-        return new PageResponse<>(
-                bookResponse,
-                allBorrowedBooks.getNumber(),
-                allBorrowedBooks.getSize(),
-                allBorrowedBooks.getTotalElements(),
-                allBorrowedBooks.getTotalPages(),
-                allBorrowedBooks.isFirst(),
-                allBorrowedBooks.isLast()
-        );
+        return bookReadingHistoryService.findAllReadingBooksByOwner(page, size, user.getId());
     }
+
+    public void removeReadingBook(int bookId, Authentication connectedUser) {
+        User user = (User) connectedUser.getPrincipal();
+        bookReadingHistoryService.removeBookFromReading(user.getId(), bookId);
+    }
+
+
 
     public Integer updateShareableStatus(Integer bookId, Authentication connectedUser) {
         Book book = getBookFromDB(bookId);
@@ -190,63 +174,6 @@ public class BookService {
         book.setArchived(book.isArchived());
         bookRepository.save(book);
         return bookId;
-    }
-
-    public Integer borrowBook(Integer bookId, Authentication connectedUser) {
-        Book book = getBookFromDB(bookId);
-
-        if(book.isArchived() || !book.isShareable()) {
-            throw new OperationNotPermittedException("The requested book cannot be borrowed");
-        }
-        User user = (User) connectedUser.getPrincipal();
-        if(Objects.equals(book.getOwner().getId(), user.getId())) {
-            throw new OperationNotPermittedException("You cannot borrow your own book");
-        }
-        final boolean isAlreadyBorrowed = bookTransactionHistoryRepository.isAlreadyBorrowedByUser(bookId, user.getId());
-
-        if(isAlreadyBorrowed) {
-            throw new OperationNotPermittedException("The requested book is already borrowed");
-        }
-
-        BookTransactionHistory bookTransactionHistory = BookTransactionHistory.builder()
-                .user(user)
-                .book(book)
-                .returned(false)
-                .returnApproved(false)
-                .build();
-        return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
-    }
-
-    public Integer returnBorrowBook(Integer bookId, Authentication connectedUser) {
-        Book book = getBookFromDB(bookId);
-        if(book.isArchived() || !book.isShareable()) {
-            throw new OperationNotPermittedException("The requested book cannot be returned");
-        }
-        User user = (User) connectedUser.getPrincipal();
-        if(Objects.equals(book.getOwner().getId(), user.getId())) {
-            throw new OperationNotPermittedException("You cannot return your own book");
-        }
-        BookTransactionHistory bookTransactionHistory = bookTransactionHistoryRepository.findByBookIdAndUserId(bookId, user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("You did not borrow this book"));
-        bookTransactionHistory.setReturned(true);
-        return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
-
-    }
-
-    public Integer approveReturnBorrowBook(Integer bookId, Authentication connectedUser) {
-        Book book = getBookFromDB(bookId);
-        if(book.isArchived() || !book.isShareable()) {
-            throw new OperationNotPermittedException("The requested book cannot be returned");
-        }
-        User user = (User) connectedUser.getPrincipal();
-        if(Objects.equals(book.getOwner().getId(), user.getId())) {
-            throw new OperationNotPermittedException("You cannot return your own book");
-        }
-        BookTransactionHistory bookTransactionHistory = bookTransactionHistoryRepository.findByBookIdAndOwnerId(bookId, user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("The book is not returned Yet. You cannot approve return this book"));
-
-        bookTransactionHistory.setReturnApproved(true);
-        return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
     }
 
     public void uploadBookCoverPicture(Integer bookId, MultipartFile file, Authentication connectedUser) {

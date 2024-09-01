@@ -1,0 +1,106 @@
+/* Container Styles */
+.comp-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;    
+  height: 92.3vh; 
+  width: 100%;         
+
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column; /* Ensure children stack vertically */
+  padding: 2rem 1.5rem;           
+  background-color: #fff;  
+  border-radius: 8px;      
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Ensure the container takes full width if needed */
+  max-width: 400px; /* Set a max-width to avoid stretching too much */
+  overflow: hidden; /* Ensure no overflow of child elements */
+}
+
+/* Form Title */
+.form-title {
+  text-align: center;
+  font-size: 1.37rem;
+  font-weight: 600;
+  margin-bottom: 1.87rem;
+}
+
+/* Login Form Styles */
+.login-form {
+  width: 100%; /* Ensure form takes full width of its container */
+}
+
+/* Input Wrapper Styles */
+.input-wrapper {
+  position: relative; /* Ensure that the icon is positioned relative to the wrapper */
+  margin-bottom: 1.5rem;
+  width: 100%; /* Ensure the wrapper takes full width of its container */
+}
+
+.input-field {
+  height: 45px;
+  width: 100%; /* Ensure input field respects container width */
+  padding-left: 2.5rem; /* Add space for the icon */
+  border-radius: 26px;
+  border: 1px solid grey;
+  font-size: 1.06rem;
+  outline: none;
+  box-sizing: border-box; /* Ensure padding is included in the width */
+}
+
+.login-icons {
+  color: rgb(63, 63, 63);
+  position: absolute;
+  top: 50%;
+  left: 0.75rem; /* Adjust left to ensure proper spacing from the edge */
+  transform: translateY(-50%); /* Center the icon vertically */
+  pointer-events: none; /* Ensure icon does not interfere with input */
+}
+
+.login-icons-alert {
+  top: 34%;
+  color: red;
+}
+
+/* Button Styles */
+.login-btn {
+  background-color: #606c38; /* Blue button */
+  color: #fff; /* White text */
+  border: none;
+  border-radius: 26px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.06rem;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.login-btn:hover {
+  background-color: #8a8e5e; /* Darker blue on hover */
+}
+
+/* Signup Text Styles */
+.signup-text {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.signup-text .forgot-pass-link {
+  color: #606c38  ;
+  text-decoration: none;
+}
+
+.signup-text .forgot-pass-link:hover {
+  text-decoration: underline;
+}
+
+
+.alert {
+  margin-left: 10px;
+  color: red;
+  display: block;
+}

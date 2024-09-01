@@ -1,0 +1,13 @@
+<div class="cards">
+  <div class="card" *ngFor="let book of books" (click)="navigateToBookDetails(book.id)"   >
+    <img
+      [src]="book.coverPhot ? book.coverPhoto : coverPhotoNotFound"
+      alt="Book Cover"
+      class="cover-photo"
+    />
+    <div class="card-content">
+      <h3 class="card-title">{{ truncateTitle(book.title) }}</h3>
+      <p class="card-author">{{ book.authorName }}</p>
+    </div>
+  </div>
+</div>

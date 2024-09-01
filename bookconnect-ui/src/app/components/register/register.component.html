@@ -1,0 +1,83 @@
+<div class="comp-container">
+    <div class="login-container">
+      <h2 class="form-title">Register</h2>
+      <form #f="ngForm" class="login-form" (ngSubmit)="onSubmit(f)">
+        <div class="input-wrapper">
+          <input
+            type="text"
+            placeholder="First name"
+            class="input-field"
+            name="firstName"
+            ngModel
+            #firstName="ngModel"
+            required
+          />
+          <span class="material-symbols-outlined login-icons" [ngClass]="{'login-icons-alert': firstName.touched && firstName.invalid}">person</span>
+          <span *ngIf="firstName.touched && firstName.invalid" class="alert">
+            <ng-container *ngIf="firstName.errors?.['required']">First name is required.</ng-container>
+          </span>
+        </div>
+  
+        <div class="input-wrapper">
+          <input
+            type="text"
+            placeholder="Last name"
+            class="input-field"
+            name="lastName"
+            ngModel
+            #lastName="ngModel"
+            required
+          />
+          <span class="material-symbols-outlined login-icons" [ngClass]="{'login-icons-alert': lastName.touched && lastName.invalid}">person</span>
+          <span *ngIf="lastName.touched && lastName.invalid" class="alert">
+            <ng-container *ngIf="lastName.errors?.['required']">Last name is required.</ng-container>
+          </span>
+        </div>
+  
+        <div class="input-wrapper">
+          <input
+            type="text"
+            placeholder="Email address"
+            class="input-field"
+            name="email"
+            ngModel
+            #email="ngModel"
+            required
+            email
+            autocomplete="username"
+          />
+          <span class="material-symbols-outlined login-icons" [ngClass]="{'login-icons-alert': email.touched && email.invalid}">mail</span>
+          <span *ngIf="email.touched && email.invalid" class="alert">
+            <ng-container *ngIf="email.errors?.['required']">Email is required.</ng-container>
+            <ng-container *ngIf="email.errors?.['email']">Invalid email format ex: user&#64;mail.com.</ng-container>
+          </span>
+        </div>
+  
+        <div class="input-wrapper">
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            class="input-field"
+            ngModel
+            #password="ngModel"
+            required
+            minlength="8"
+            autocomplete="new-password"
+          />
+          <span class="material-symbols-outlined login-icons" [ngClass]="{'login-icons-alert': password.touched && password.invalid}">lock</span>
+          <span *ngIf="password.touched && password.invalid" class="alert">
+            <ng-container *ngIf="password.errors?.['required']">Password is required.</ng-container>
+            <ng-container *ngIf="password.errors?.['minlength']">Password must be greater than 8 characters.</ng-container>
+          </span>
+        </div>
+  
+        <button type="submit" class="login-btn" [disabled]="f.invalid">Register</button>
+        <p class="signup-text">
+          Already have an account? 
+          <a [routerLink]="['/login']" class="forgot-pass-link">Login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+  

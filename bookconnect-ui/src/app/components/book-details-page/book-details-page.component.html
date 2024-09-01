@@ -1,0 +1,33 @@
+<div class="book-detail-container">
+  <div class="book-cover">
+    <img
+      [src] = "!book.coverPhoto ? book.coverPhoto: coverPhotNotFound"
+      alt="Book Cover"
+    />
+  </div>
+  <div class="book-details">
+    <h1 class="book-title">{{book.title}}</h1>
+    <div class="book-rating">
+      <span class="star">★</span>
+      <span class="star">★</span>
+      <span class="star">★</span>
+      <span class="star">★</span>
+      <span>☆</span>
+      <span class="rating-text"> ({{book.rate }}/5)</span>
+    </div>
+    <p><strong>Author: </strong>{{ book.authorName }}</p>
+    <p><strong>ISBN: </strong>{{ book.isbn }}</p>
+    <p>
+      <strong>Genre: </strong><span class="book-genre">genre</span>
+    </p>
+    <p class="book-synposis-content">
+      <strong>Synopsis:</strong>
+      {{ book.synopsis  }}
+    </p>
+    <button class="book-button read-button">Read Book</button>
+    <!-- <button class="book-button edit-button">Edit Book</button> -->
+    <button *ngIf="isOwnerOfBook(book)" class="book-button delete-button" (click)="deleteBook(book.id)">Delete Book</button>
+  </div>
+</div>
+
+<app-feedback></app-feedback>

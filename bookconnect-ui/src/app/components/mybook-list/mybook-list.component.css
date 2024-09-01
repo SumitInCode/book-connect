@@ -1,0 +1,93 @@
+/* Heading Style */
+
+h1 {
+  position: relative;
+  font-weight: 300;
+  color: #080808;
+  -webkit-transition: all 0.4s ease 0s;
+  -o-transition: all 0.4s ease 0s;
+  transition: all 0.4s ease 0s;
+}
+
+h1 span {
+  display: block;
+  font-size: 0.5em;
+  line-height: 1.3;
+}
+h1 em {
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* Style 8
+     ----------------------------- */
+.eight h1 {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 300;
+  font-size: 26px;
+  letter-spacing: 3px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 16px 0;
+  grid-gap: 22px;
+}
+
+.eight h1:after,
+.eight h1:before {
+  content: " ";
+  display: block;
+  border-bottom: 2px solid #ccc;
+}
+
+.book-heading {
+  position: relative;
+  width: 90%;
+  padding-top: 20px;
+  margin: 1.5em auto;
+}
+
+.authentication-failed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  height: 92.3vh;
+  text-align: center; 
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 2rem;
+  margin-bottom: 3rem; 
+}
+
+.btn {
+  width: 150px;
+  background-color: #606c38;
+  border: none;
+  outline: none;
+  height: 49px;
+  border-radius: 49px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background-color: #8a8e5e;
+}
+
+@media (max-width: 870px) {
+  .btn.transparent {
+    width: 110px;
+    height: 35px;
+    font-size: 1.7rem;
+  }
+}
+
+

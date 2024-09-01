@@ -1,0 +1,172 @@
+.formbold-main-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  
+}
+
+.formbold-form-wrapper {
+  margin: 0 auto;
+  max-width: 550px;
+  width: 100%;
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.formbold-input-flex {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr; /* Adjusts to one full-width and one that takes up two-thirds of the width */
+  gap: 20px; /* Space between columns */
+  margin-bottom: 22px;
+}
+
+.formbold-input-flex .formbold-full-width {
+  grid-column: span 2; /* Ensures this input takes up both columns */
+}
+
+.formbold-textarea {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 22px;
+}
+
+.formbold-form-input {
+  width: 100%;
+  padding: 10px; /* Adjusted padding for better spacing */
+  border-radius: 20px;
+  border: 1px solid #dde3ec;
+  background: #ffffff;
+  font-weight: 500;
+  font-size: 16px;
+  color: #07074d;
+  outline: none;
+  box-sizing: border-box; /* Ensure padding is included in width */
+}
+
+.formbold-form-input::placeholder {
+  color: #536387;
+}
+
+.formbold-form-input:focus {
+  border-color: #8a8e5e;
+}
+
+.formbold-form-label {
+  color: #07074d;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 24px;
+  display: block;
+  margin-bottom: 8px; /* Adjusted for spacing above input */
+}
+
+.formbold-input-file {
+  margin-top: 30px;
+}
+
+.formbold-input-file input[type="file"] {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  z-index: -1;
+}
+
+.formbold-input-file .formbold-input-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.formbold-filename-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+
+.formbold-filename {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  line-height: 24px;
+  color: #536387;
+}
+
+.formbold-filename svg {
+  cursor: pointer;
+}
+
+.formbold-btn {
+  font-size: 16px;
+  border-radius: 25px;
+  padding: 12px 25px;
+  border: none;
+  font-weight: 500;
+  background-color: #606c38;
+  color: white;
+  cursor: pointer;
+  margin-top: 25px;
+}
+
+.formbold-btn:hover {
+  background-color: #8a8e5e;
+}
+
+.formbold-checkbox-label {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between the checkbox and the label text */
+  font-size: 14px;
+  color: #07074d;
+  font-weight: 500;
+  justify-content: center;
+}
+
+.formbold-checkbox-input {
+  display: none; /* Hide the default checkbox */
+}
+
+.formbold-checkbox-custom {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #dde3ec;
+  background-color: #ffffff;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+}
+
+.formbold-checkbox-input:checked + .formbold-checkbox-custom {
+  background-color: #606c38;
+  border-color: #8a8e5e;
+}
+
+.formbold-checkbox-custom::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 3px;
+  width: 8px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+}
+
+.formbold-checkbox-input:checked + .formbold-checkbox-custom::after {
+  opacity: 1;
+}
+.cover-photo-preview {
+  max-width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border: 1px solid #dde3ec;
+  border-radius: 4px;
+}

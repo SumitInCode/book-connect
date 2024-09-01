@@ -1,0 +1,140 @@
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+    <form (ngSubmit)="onSubmit(bookForm)" #bookForm="ngForm">
+      <div class="formbold-input-flex">
+        <!-- Existing form fields -->
+        <div class="formbold-full-width">
+          <label for="title" class="formbold-form-label">Title</label>
+          <input
+            type="text"
+            name="title"
+            ngModel
+            placeholder="War of Good"
+            class="formbold-form-input"
+            required
+          />
+        </div>
+
+        <div class="formbold-full-width">
+          <label for="authorName" class="formbold-form-label"
+            >Author name</label
+          >
+          <input
+            type="text"
+            name="authorName"
+            ngModel
+            placeholder="Jane Doe"
+            class="formbold-form-input"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="isbn" class="formbold-form-label">ISBN</label>
+          <input
+            type="text"
+            name="isbn"
+            ngModel
+            placeholder="ISBN No."
+            class="formbold-form-input"
+            required
+          />
+        </div>
+
+        <div class="formbold-checkbox-wrapper">
+          <label class="formbold-checkbox-label">
+            <input
+              type="checkbox"
+              name="shareable   "
+              ngModel
+              value="true"
+              class="formbold-checkbox-input"
+            />
+            <span class="formbold-checkbox-custom"></span>
+            <span>Opensource this book?</span>
+          </label>
+        </div>
+      </div>
+      <div class="formbold-full-width">
+        <label for="genre" class="formbold-form-label">Genre</label>
+        <input
+          type="text"
+          name="genre"
+          ngModel
+          placeholder="FORMAT: Fantasy Adventure"
+          class="formbold-form-input"
+          required
+        />
+      </div>
+      <div class="formbold-textarea">
+        <label for="synopsis" class="formbold-form-label">Synopsis:</label>
+        <textarea
+          rows="6"
+          name="synopsis"
+          ngModel
+          id="synopsis"
+          placeholder="Write your book synopsis..."
+          class="formbold-form-input"
+        ></textarea>
+      </div>
+
+      <div class="formbold-input-file">
+        <div class="formbold-filename-wrapper">
+          <span class="formbold-filename" *ngIf="coverPhotoName">
+            {{ coverPhotoName }}
+            <span class="material-symbols-outlined" (click)="removeCoverPhoto()"
+              >remove</span
+            >
+          </span>
+          <span class="formbold-filename" *ngIf="!coverPhotoName"
+            >No cover photo selected</span
+          >
+        </div>
+        <label for="coverPhoto" class="formbold-input-label">
+          <span class="material-symbols-outlined">photo</span>
+          Upload cover photo
+          <input
+            type="file"
+            name="coverPhoto"
+            id="coverPhoto"
+            #coverPhotoInput
+            (change)="onCoverPhotoChange($event)"
+          />
+        </label>
+        <img
+          *ngIf="coverPhotoSrc"
+          [src]="coverPhotoSrc"
+          alt="Cover Photo Preview"
+          class="cover-photo-preview"
+        />
+      </div>
+
+      <div class="formbold-input-file">
+        <div class="formbold-filename-wrapper">
+          <span class="formbold-filename" *ngIf="bookFileName">
+            {{ bookFileName }}
+            <span class="material-symbols-outlined" (click)="removeBookFile()"
+              >remove</span
+            >
+          </span>
+          <span class="formbold-filename" *ngIf="!bookFileName"
+            >No book file selected</span
+          >
+        </div>
+        <label for="bookFile" class="formbold-input-label">
+          <span class="material-symbols-outlined">attachment</span>
+          Upload book
+          <input
+            type="file"
+            name="bookFile"
+            id="bookFile"
+            #bookFileInput
+            (change)="onBookFileChange($event)"
+          />
+        </label>
+      </div>
+
+      <button type="submit" class="formbold-btn">Submit</button>
+    </form>
+  </div>
+</div>

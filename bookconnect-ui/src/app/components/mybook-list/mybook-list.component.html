@@ -1,0 +1,12 @@
+<div *ngIf="!isAuthenticated" class="authentication-failed">
+  <p>You are not logged in. Please Login to access it.</p>
+</div>
+<div *ngIf="isAuthenticated" class="eight book-heading">
+  <h1>MY BOOKS</h1>
+</div>
+<app-booklist *ngIf="isAuthenticated" [books]="myBooks"></app-booklist>
+<div *ngIf="hasMoreBooks" class="btn-container">
+  <button class="btn" (click)= "loadMyBooks()" [disabled]="isLoading">
+    Load More
+  </button>
+</div>

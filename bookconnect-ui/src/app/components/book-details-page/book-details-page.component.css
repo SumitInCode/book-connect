@@ -1,0 +1,140 @@
+.book-detail-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 200px;
+  margin-right: 200px;
+  margin-top: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #fff;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-cover {
+  flex: 1;
+  max-width: 360px;
+  margin-right: 20px;
+}
+
+.book-cover img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.book-details {
+  flex: 2;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+
+  border-radius: 8px;
+}
+
+.book-details h1 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.book-details p {
+  margin: 5px 0;
+}
+
+.book-button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #606c38;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s;
+  margin-right: 10px;
+}
+
+.read-button {
+  background-color: #606c38;
+}
+
+.read-button:hover {
+  background-color: #8a8e5e;
+}
+
+.edit-button {
+  background-color: rgb(58, 58, 248);
+}
+
+.edit-button:hover {
+  background-color: rgb(46, 46, 173);
+}
+
+.delete-button {
+  background-color: rgb(225, 35, 35);
+}
+
+.delete-button:hover {
+  background-color: rgb(195, 37, 37);
+}
+
+.book-detail-container .book-synposis {
+  margin-top: 15px;
+}
+
+.book-detail-container .book-synposis-content {
+  line-height: 28px;
+  text-align: justify;
+}
+
+.book-rating {
+  margin-bottom: 8px;
+}
+
+.book-rating .star {
+  color: #f5c518;
+}
+
+.book-genre {
+  font-style: italic;
+}
+
+@media (max-width: 1024px) {
+  .book-detail-container {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    margin-left: 60px;
+    margin-right: 60px;
+  }
+  .book-cover {
+    max-width: 250px;
+    margin-right: 0;
+    margin-bottom: 15px;
+  } 
+  .book-details {
+    text-align: center;
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .book-detail-container {
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+  }
+  .book-detail-container .book-synposis-content {
+    text-align: center;
+  }
+  .book-cover {
+    max-width: 250px;
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+
+  .book-details {
+    text-align: center;
+  }
+}     

@@ -1,0 +1,42 @@
+<nav>
+    <div class="logo">
+      <a routerLink="/" class="logo-link">
+        <span class="material-symbols-outlined bookconnect-logo">
+            library_books
+        </span>
+        <span class="logo-text">BookConnect</span>
+      </a>
+    </div>
+        <label for="menu-btn" class="menu-btn" (click)="toggleMenu()">
+      <span class="material-symbols-outlined">
+        menu
+      </span>
+    </label>
+    <ul [ngClass]="{ 'show': menuOpen }">
+      <li>
+        <a routerLink="/home" (click)="toggleMenu()">Home</a>
+      </li>
+      <li>
+        <a routerLink="/library" (click)="toggleMenu()">LIBRARY</a>
+      </li>
+      <li>
+        <a routerLink="/book-shelf" (click)="toggleMenu()">BookShelf</a>
+      </li>
+      <li>
+        <a routerLink="/add-book" (click)="toggleMenu()">ADD BOOK</a>
+      </li>
+      <li>
+        <a routerLink="/my-books" (click)="toggleMenu()">MY BOOKS</a>
+      </li>
+      <li>
+        <button class="button" (click)="isAuthenticated ? handleLogout() : handleGetStarted()">
+          <!-- <span>{{ isAuthenticated ? 'Logout' : 'Get Started' }}</span> -->
+          <span *ngIf="isAuthenticated">Logout</span>
+          <span *ngIf="!isAuthenticated">Get Started!</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+  <!-- Temp solution -->
+  <div class="navbar-spacer"></div>
+  

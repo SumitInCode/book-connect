@@ -96,6 +96,9 @@ public class StorageService {
     }
 
     public String getFullFilePath(String relativePath) {
+        if(relativePath == null) {
+            return null;
+        }
         return Paths.get(relativePath).toAbsolutePath().normalize().toString();
     }
 }

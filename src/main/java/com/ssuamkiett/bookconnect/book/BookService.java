@@ -53,10 +53,30 @@ public class BookService {
                 .build();
     }
 
-    public BookResponse findById(Integer bookId) {
-        return bookRepository.findById(bookId)
-                .map(bookMapper::toBookResponse)
+    public BookResponse findById(Integer bookId, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        if(connectedUser == null) {
+            return findById(bookId, book);
+        }
+
+        User user = (User) connectedUser.getPrincipal();
+        if(Objects.equals(book.getOwner().getId(), user.getId())) {
+            return bookMapper.toBookResponse(book);
+        }
+
+        if(book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("Operation not permitted!");
+        }
+
+        return bookMapper.toBookResponse(book);
+    }
+
+    private BookResponse findById(Integer bookId, Book book) {
+        if(book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("Operation not permitted!");
+        }
+        return bookMapper.toBookResponse(book);
     }
 
     public PageResponse<BookResponse> findAllBooks(int page, int size, Authentication connectedUser) {

@@ -20,11 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class BookController {
     private final BookService bookService;
 
-            @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BookResponse> saveBook(
-                                            @Valid @RequestPart("formData") BookRequest bookRequest,
-                                            @NotNull @RequestPart("coverPhoto") MultipartFile coverPhoto,
-                                            Authentication connectUser) {
+            @Valid @RequestPart("formData") BookRequest bookRequest,
+            @NotNull @RequestPart("coverPhoto") MultipartFile coverPhoto,
+            Authentication connectUser) {
         return ResponseEntity.ok(bookService.save(bookRequest, coverPhoto, connectUser));
     }
 
@@ -34,9 +34,9 @@ public class BookController {
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/{book-id}")
-    public ResponseEntity<BookResponse> findBookById(@PathVariable("book-id") Integer bookId) {
-        return ResponseEntity.ok(bookService.findById(bookId));
+    @GetMapping("/book/{book-id}")
+    public ResponseEntity<BookResponse> findBookById(@PathVariable("book-id") Integer bookId, Authentication connectedUser) {
+        return ResponseEntity.ok(bookService.findById(bookId, connectedUser));
     }
 
     @GetMapping
@@ -117,7 +117,7 @@ public class BookController {
     }
 
     @PostMapping(value = "/pdf/{bookId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadFile (
+    public ResponseEntity<?> uploadFile(
             @NotNull @PathVariable("bookId") Integer bookId,
             @RequestPart("file") MultipartFile file,
             Authentication connectedUser) {
@@ -125,10 +125,10 @@ public class BookController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/books/pdf/{bookId}")
+    @GetMapping("/pdf/{bookId}")
     public ResponseEntity<?> getFile(@PathVariable("bookId") Integer bookId, Authentication connectedUser) {
         byte[] file = bookService.getBookPDF(bookId, connectedUser);
-        if(file == null) {
+        if (file == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.status(HttpStatus.OK).

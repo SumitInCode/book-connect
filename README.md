@@ -32,7 +32,7 @@ mvn spring-boot:run
 ```bash
 cd bookconnect-ui
 npm install    // Install the necessary dependencies:
-npm run start 
+ng serve --port 3000
 ```
 
  ### Note: The UI currently does not have full basic functionality.

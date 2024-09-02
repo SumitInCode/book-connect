@@ -1,6 +1,7 @@
 package com.ssuamkiett.bookconnect.user;
 
 import com.ssuamkiett.bookconnect.book.Book;
+import com.ssuamkiett.bookconnect.history.BookReadingHistory;
 import com.ssuamkiett.bookconnect.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,6 +50,9 @@ public class User implements UserDetails, Principal {
     private List<Role> roles;
     @OneToMany(mappedBy = "owner")
     private List<Book> books;
+    @OneToMany(mappedBy = "user")
+    private List<BookReadingHistory> bookReadingHistories;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles

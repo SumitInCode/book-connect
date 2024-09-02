@@ -3,12 +3,14 @@ package com.ssuamkiett.bookconnect.book;
 import com.ssuamkiett.bookconnect.exception.OperationNotPermittedException;
 import com.ssuamkiett.bookconnect.file.StorageService;
 import com.ssuamkiett.bookconnect.file.FileType;
+import com.ssuamkiett.bookconnect.history.BookReadStatus;
 import com.ssuamkiett.bookconnect.history.BookReadingHistoryService;
 import com.ssuamkiett.bookconnect.history.BookReadingResponse;
 import com.ssuamkiett.bookconnect.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Objects;
 
@@ -211,7 +215,7 @@ public class BookService {
         bookRepository.save(book);
     }
 
-    public byte[] getBookPDF(Integer bookId, Authentication connectedUser) {
+    public InputStreamResource streamBookFile(Integer bookId, Authentication connectedUser) {
         Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
         if(Objects.equals(book.getOwner().getId(), user.getId())) {
@@ -219,8 +223,16 @@ public class BookService {
         }
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("Operation not permitted to retrieve book");
+
         }
-        return storageService.readFileFromLocation(book.getBookPDF());
+
+        try {
+            FileInputStream resource = new FileInputStream(book.getBookPDF());
+            return new InputStreamResource(resource);
+        }
+        catch (FileNotFoundException e) {
+            throw new EntityNotFoundException("Book file not found");
+        }
     }
 
     public PageResponse<BookResponse> findAllBooksByTitle(int page, int size, String searchQuery) {
@@ -239,5 +251,10 @@ public class BookService {
                 books.isFirst(),
                 books.isLast()
         );
+    }
+
+    public BookReadStatus getReadingStatus(Integer bookId, Authentication connectedUser) {
+        User user = (User) connectedUser.getPrincipal();
+        return bookReadingHistoryService.getReadingStatus(user.getId(), bookId);
     }
 }

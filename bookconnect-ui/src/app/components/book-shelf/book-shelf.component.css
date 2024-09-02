@@ -50,11 +50,42 @@ h1 em {
   border-bottom: 2px solid #ccc;
 }
 
-
 .book-heading {
-    position: relative;
-    width: 90%;
-    padding-top: 20px;
-    margin: 1.5em auto;
+  position: relative;
+  width: 90%;
+  padding-top: 20px;
+  margin: 1.5em auto;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+.btn {
+  width: 150px;
+  background-color: #606c38;
+  border: none;
+  outline: none;
+  height: 49px;
+  border-radius: 49px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background-color: #8a8e5e;
+}
+
+@media (max-width: 870px) {
+  .btn.transparent {
+    width: 110px;
+    height: 35px;
+    font-size: 1.7rem;
   }
-  
+}

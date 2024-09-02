@@ -7,6 +7,7 @@ import { BookDetailsPageComponent } from './components/book-details-page/book-de
 import { MybookListComponent } from './components/mybook-list/mybook-list.component';
 import { BookCollectionComponent } from './components/book-library/book-library.component';
 import { AddBookComponent } from './components/add-book/add-book.component';
+import { PdfReaderComponent } from './components/pdf-reader/pdf-reader.component';
 
 export const routes: Routes = [
     {path: '', component: HomepageComponent  },
@@ -17,5 +18,6 @@ export const routes: Routes = [
     {path: 'book-shelf', component: BookShelfComponent},
     {path: 'my-books', component: MybookListComponent},
     {path: 'add-book', component: AddBookComponent},
-    {path: 'book-details/:id', component: BookDetailsPageComponent}
+    {path: 'book-details/:id', component: BookDetailsPageComponent},
+    {path: 'reader/:id', component: PdfReaderComponent},
 ];

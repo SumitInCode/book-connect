@@ -19,20 +19,20 @@
       <li>
         <a routerLink="/library" (click)="toggleMenu()">LIBRARY</a>
       </li>
-      <li>
+      <li *ngIf="isAuthenticated">
         <a routerLink="/book-shelf" (click)="toggleMenu()">BookShelf</a>
       </li>
-      <li>
+      <li *ngIf="isAuthenticated">
         <a routerLink="/add-book" (click)="toggleMenu()">ADD BOOK</a>
       </li>
-      <li>
+      <li *ngIf="isAuthenticated">
         <a routerLink="/my-books" (click)="toggleMenu()">MY BOOKS</a>
       </li>
       <li>
-        <button class="button" (click)="isAuthenticated ? handleLogout() : handleGetStarted()">
+        <button class="button" (click)="isAuthenticated ? handleLogout() : handleLogin()">
           <!-- <span>{{ isAuthenticated ? 'Logout' : 'Get Started' }}</span> -->
           <span *ngIf="isAuthenticated">Logout</span>
-          <span *ngIf="!isAuthenticated">Get Started!</span>
+          <span *ngIf="!isAuthenticated">Login</span>
         </button>
       </li>
     </ul>

@@ -3,6 +3,7 @@ import { SearchFormComponent } from '../search-form/search-form.component';
 import { BooklistComponent } from "../booklist/booklist.component";
 import { CommonModule } from '@angular/common';
 import { AuthContextService } from '../../shared/auth-context.service';
+import { MybookService } from '../../services/mybook.service';
 
 @Component({
   selector: 'app-book-shelf',
@@ -19,42 +20,41 @@ export class BookShelfComponent {
   hasMoreBooks: boolean = true;
   isAuthenticated: boolean = false;
 
-  // private mybookService = inject(MybookService);
+  private mybookService = inject(MybookService);
   private authContextService = inject(AuthContextService);
-  private cdr = inject(ChangeDetectorRef);
 
-  constructor() { }
-
-  ngOnInit() {
+  constructor() { 
     this.authContextService.getAuthenticationStatus().subscribe(status => {
       this.isAuthenticated = status;
-      this.cdr.detectChanges();
-      // if (this.isAuthenticated) {
-      //   this.loadMyBooks();
-      // }
     });
   }
 
-  // loadMyBooks() {
-  //   if (this.isLoading) {
-  //     return;
-  //   }
-  //   this.isLoading = true;
-  //   this.mybookService.getMyBooks(this.page, this.size).subscribe({
-  //     next: (response: any) => {
-  //       if (response.content.length > 0) {
-  //         this.books = [...this.books, ...response.content];
-  //       }
-  //       this.hasMoreBooks = !response.last;
-  //     },
-  //     complete: () => {
-  //       this.page++;
-  //       this.isLoading = false;
-  //     },
-  //     error: (error) => {
-  //       console.error('Failed to load books', error);
-  //       this.isLoading = false;
-  //     },
-  //   });
-  // }
+  ngOnInit() {
+    if(this.isAuthenticated) {
+      this.loadMyReadingBooks();
+    }
+  }
+
+  loadMyReadingBooks() {
+    if (this.isLoading) {
+      return;
+    }
+    this.isLoading = true;
+    this.mybookService.getMyReadingBooks(this.page, this.size).subscribe({
+      next: (response: any) => {
+        if (response.content.length > 0) {
+          this.books = [...this.books, ...response.content];
+        }
+        this.hasMoreBooks = !response.last;
+      },
+      complete: () => {
+        this.page++;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Failed to load books', error);
+        this.isLoading = false;
+      },
+    });
+  }
 }

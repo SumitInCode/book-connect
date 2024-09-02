@@ -5,10 +5,7 @@ import { catchError, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const baseUrl = "http://localhost:8080/api/v1";
-  const authService = inject(AuthService);
-  let accessToken = authService.getAccessToken();
-  
-
+  const authService = inject(AuthService);  
   if (req.url === getFullUrl(authService.refreshUrl) || req.url === getFullUrl(authService.authUrl)) {
     return next(req); 
   }
@@ -16,14 +13,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const cloneRequest = req.clone({
     url: getFullUrl(req.url),
     setHeaders: {
-      Authorization: `Bearer ${accessToken}`
+      Authorization: `Bearer ${authService.accesToken}`
     }
   });
   
   return next(cloneRequest).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        authService.newAcessToken$.next(true);
+        authService.getAccessTokenFromAPI();
       }
       return throwError(() => error);
     })

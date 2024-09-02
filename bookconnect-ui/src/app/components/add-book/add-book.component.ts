@@ -3,6 +3,7 @@ import { Component, ViewChild, ElementRef, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AddBookService } from '../../services/add-book.service';
 import { Router } from '@angular/router';
+import { AuthContextService } from '../../shared/auth-context.service';
 
 @Component({
   selector: 'app-add-book',
@@ -12,6 +13,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./add-book.component.css'], // Fixed the typo from styleUrl to styleUrls
 })
 export class AddBookComponent {
+  isAuthenticated: boolean  = false;
   coverPhotoName: string | null = null;
   bookFileName: string | null = null;
   coverPhotoSrc: string | ArrayBuffer | null = null;
@@ -20,6 +22,12 @@ export class AddBookComponent {
   private router = inject(Router);
   @ViewChild('coverPhotoInput') coverPhotoInput!: ElementRef;
   @ViewChild('bookFileInput') bookFileInput!: ElementRef;
+
+  constructor(private authContextService: AuthContextService) {
+    this.authContextService.getAuthenticationStatus().subscribe(status => {
+      this.isAuthenticated = status;
+    })
+  }
 
   onCoverPhotoChange(event: Event): void {
     const input = event.target as HTMLInputElement;

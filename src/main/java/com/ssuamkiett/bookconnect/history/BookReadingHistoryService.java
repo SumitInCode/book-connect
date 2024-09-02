@@ -22,6 +22,10 @@ public class BookReadingHistoryService {
     private final BookMapper bookMapper;
 
     public void addBookToReading(User user, Book book) {
+        if(bookReadingHistoryRepository.existsByUserIdAndBookId(user.getId(), book.getId())) {
+            throw new OperationNotPermittedException("Already have a book to read");
+        }
+
         bookReadingHistoryRepository.save(
                 BookReadingHistory.builder()
                         .user(user)
@@ -54,5 +58,12 @@ public class BookReadingHistoryService {
                 allBookReadingHistories.isFirst(),
                 allBookReadingHistories.isLast()
         );
+    }
+    
+    public BookReadStatus getReadingStatus(Integer userId, Integer bookId) {
+        boolean status = bookReadingHistoryRepository.existsByUserIdAndBookId(userId, bookId);
+        return BookReadStatus.builder()
+                .isReading(status)
+                .build();
     }
 }

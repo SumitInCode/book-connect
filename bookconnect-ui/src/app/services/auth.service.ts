@@ -1,101 +1,101 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
-import { Subject, tap, Observable } from 'rxjs';
+import { Subject, tap, Observable, race } from 'rxjs';
 import { AuthContextService } from '../shared/auth-context.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-            authUrl: string = '/auth/authenticate';
+  authUrl: string = '/auth/authenticate';
   refreshUrl: string = '/auth/refresh-token';
   accesToken: string = "";
 
   private authContextService = inject(AuthContextService);
 
-  private cookieService = inject(CookieService);
-  public newAcessToken$ = new Subject<boolean>();
-
   constructor(private http: HttpClient) {
-    this.newAcessToken$.subscribe((response: any) => {
-      this.getAccessTokenUsingRefreshToken();
-    });
   }
 
   onLogin(loginData: any): Observable<any> {
     return this.http.post<any>(this.authUrl, loginData).pipe( 
       tap((response) => {
-        if (response && response.refreshToken) {
-          if (this.checkRefreshTokenInCookie()) {
-            this.deleteToken();
-          }
-          this.accesToken = response.accessToken;
-          this.saveToken(response.refreshToken);
-        }
+        this.accesToken = response.accessToken;
+        this.saveToken(response.refreshToken, response.accessToken, new Date(new Date().setDate(new Date().getDate() + 7)));
+        this.authContextService.setAuthenticationstatus(true);
       })
     );
   }
-  
-  onStartUpInit() {
-    if(this.checkRefreshTokenInCookie() && !this.accesToken) {
-      this.getAccessTokenUsingRefreshToken();
-    }
-  }
 
   onLogout() {
-    if(this.cookieService.check('refreshToken')) {
-      this.deleteToken(); 
-    }
+    this.deleteToken();
     this.authContextService.setAuthenticationstatus(false);
   }
 
-  saveToken(token: string) {
-    this.cookieService.set('refreshToken', token);
+  autoLogin() {
+    let expirationTime = this.getExpiration();
+    if(expirationTime && (new Date() > new Date(expirationTime)))  {
+      return;
+    }
+    console.log("here 1")
+    let accessToken = this.getAccessTokenFromLocalStorage()
+    if(accessToken) {
+      this.accesToken = accessToken;
+      this.authContextService.setAuthenticationstatus(true)
+      return;
+    }
+    console.log("here 2")
+    let refreshToken = this.getRefreshTokenLocalStorage();
+    if(refreshToken) {
+      this.requestAccessToken(refreshToken);
+    }
   }
 
-  getToken(): string {
-    return this.cookieService.get('refreshToken');
+  saveToken(refreshToken: string | null, accessToken: string | null, expirationDate: Date | null) {
+    if(refreshToken) {
+      localStorage.setItem("refreshToken", refreshToken);
+    }
+    if(accessToken) {
+      localStorage.setItem('accessToken', accessToken);
+    }
+    if(expirationDate) {
+      localStorage.setItem('expirationDate', JSON.stringify(expirationDate));
+    }
   }
 
   deleteToken() {
-    this.cookieService.delete('refreshToken');
+    localStorage.clear();
   }
 
-  checkRefreshTokenInCookie(): boolean {
-    return this.cookieService.check('refreshToken');
+  getExpiration(): string | null {
+   return localStorage.getItem('expirationDate');
   }
 
-  getAccessToken(): string {
-    return this.accesToken;
+  getRefreshTokenLocalStorage(): string | null{
+    return localStorage.getItem('refreshToken');
   }
 
-  getRefreshToken(): string {
-    return this.getToken();
+  getAccessTokenFromLocalStorage(): string | null{
+    return localStorage.getItem('accessToken');
   }
 
-  getAccessTokenUsingRefreshToken() {
-    const headers = { Authorization: `Bearer ${this.getRefreshToken()}` }
+  getAccessTokenFromAPI() {
+    let refreshToken = localStorage.getItem('refreshToken');
+    if(refreshToken) {
+      this.requestAccessToken(refreshToken);
+    }
+    this.authContextService.setAuthenticationstatus(true);
+  }
+
+  requestAccessToken(refreshToken: string) {
+    const headers = { Authorization: `Bearer ${refreshToken}` }
     this.http
       .post(`http://localhost:8080/api/v1${this.refreshUrl}`, {}, {headers})
       .subscribe({
         next: (response: any) => {
           this.accesToken = response.accessToken;
+          this.saveToken(response.accessToken, null, null);
         },
         complete: () => {
-          if(this.accesToken) {
-            this.authContextService.setAuthenticationstatus(true);
-          }
-        },
-        error: (error) => {
-          console.log(error.error)
-          if(error.status == 400) {
-            this.onLogout();
-            if(this.checkRefreshTokenInCookie()) {
-              this.deleteToken();
-            }
-            alert("Please authenticate yourself!")
-          }
         }
     });
   }

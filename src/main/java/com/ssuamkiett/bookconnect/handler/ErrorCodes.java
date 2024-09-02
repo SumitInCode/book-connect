@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.*;
 
 public enum ErrorCodes {
     NO_CODE(0, "No Code", NOT_IMPLEMENTED),
+    OPERATION_NOT_PERMITTED(1, "Operation not permitted", FORBIDDEN),
     ACCOUNT_LOCKED(302, "User account is locked", FORBIDDEN),
     INCORRECT_CURRENT_PASSWORD(300, "Current password is incorrect", BAD_REQUEST),
     ACCOUNT_DISABLED(303, "User account is disabled", FORBIDDEN),

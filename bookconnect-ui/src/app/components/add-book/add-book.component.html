@@ -1,4 +1,4 @@
-<div class="formbold-main-wrapper">
+<div *ngIf="isAuthenticated; else NotAuthenticated" class="formbold-main-wrapper">
   <div class="formbold-form-wrapper">
     <form (ngSubmit)="onSubmit(bookForm)" #bookForm="ngForm">
       <div class="formbold-input-flex">
@@ -75,6 +75,7 @@
           id="synopsis"
           placeholder="Write your book synopsis..."
           class="formbold-form-input"
+          minlength="100"
         ></textarea>
       </div>
 
@@ -99,6 +100,7 @@
             id="coverPhoto"
             #coverPhotoInput
             (change)="onCoverPhotoChange($event)"
+            required
           />
         </label>
         <img
@@ -130,11 +132,17 @@
             id="bookFile"
             #bookFileInput
             (change)="onBookFileChange($event)"
+            required
           />
         </label>
       </div>
 
-      <button type="submit" class="formbold-btn">Submit</button>
+      <button type="submit" class="formbold-btn" [disabled]="bookForm.invalid">Submit</button>
     </form>
   </div>
 </div>
+
+
+<ng-template #NotAuthenticated>
+  <H1>Please Login</H1>
+</ng-template>

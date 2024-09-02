@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
-public class BookConnectApplication {
+public class 		BookConnectApplication {
 	private static final Logger logger = LoggerFactory.getLogger(BookConnectApplication.class);
 	public static void main(String[] args) {
 		logger.info("BookConnect Application Started...");

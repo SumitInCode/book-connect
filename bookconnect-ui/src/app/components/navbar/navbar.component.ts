@@ -28,8 +28,8 @@ export class NavbarComponent {
     this.menuOpen = !this.menuOpen;
   }
 
-  handleGetStarted() {
-    this.router.navigate(['/get-started']);
+  handleLogin() {
+    this.router.navigate(['/login']);
     this.menuOpen = false;
   }
 

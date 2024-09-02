@@ -24,9 +24,10 @@
       <strong>Synopsis:</strong>
       {{ book.synopsis  }}
     </p>
-    <button class="book-button read-button">Read Book</button>
+    <button class="book-button read-button" (click)="readBook(book.id)">Read Book</button>
     <!-- <button class="book-button edit-button">Edit Book</button> -->
-    <button *ngIf="isOwnerOfBook(book)" class="book-button delete-button" (click)="deleteBook(book.id)">Delete Book</button>
+    <button *ngIf="!readStatus" class="book-button edit-button" (click)="handleAddToReadBook(book.id)">Add Shelf</button>
+    <button *ngIf="isAuthenticated && isOwnerOfBook(book)" class="book-button delete-button" (click)="deleteBook(book.id)">Delete Book</button>
   </div>
 </div>
 

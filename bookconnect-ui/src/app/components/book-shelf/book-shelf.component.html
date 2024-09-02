@@ -5,7 +5,9 @@
 <div *ngIf="isAuthenticated" class="eight book-heading">
   <h1>BOOK-SHELF</h1>
 </div>
-
-<ng-template #content>
-  <app-booklist [books]="books"></app-booklist>
-</ng-template>
+<app-booklist *ngIf="isAuthenticated"  [books]="books"></app-booklist>
+<div *ngIf="hasMoreBooks" class="btn-container">
+  <button class="btn" (click)= "loadMyReadingBooks()" [disabled]="isLoading">
+    Load More
+  </button>
+</div>

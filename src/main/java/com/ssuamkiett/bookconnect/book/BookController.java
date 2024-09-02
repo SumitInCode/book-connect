@@ -1,13 +1,15 @@
 package com.ssuamkiett.bookconnect.book;
 
 
+import com.ssuamkiett.bookconnect.history.BookReadStatus;
 import com.ssuamkiett.bookconnect.history.BookReadingResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -84,20 +86,20 @@ public class BookController {
         return ResponseEntity.ok(bookService.updateArchivedStatus(bookId, connectedUser));
     }
 
-    @PostMapping("/read/{book-id}")
+    @PatchMapping("/read/{book-id}")
     public ResponseEntity<Integer> addReadBook(@PathVariable("book-id") Integer bookId, Authentication connectedUser) {
         bookService.addReadBook(bookId, connectedUser);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/remove/reading/{book-id}")
+    @PatchMapping("/remove/reading/{book-id}")
     public ResponseEntity<?> removeReadingBook(@PathVariable("book-id") Integer bookId, Authentication connectedUser) {
         bookService.removeReadingBook(bookId, connectedUser);
         return ResponseEntity.ok().build();
     }
 
 
-    @PostMapping(value = "/cover/{book-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/cover/{book-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadBookCoverPicture(
             @PathVariable("book-id") Integer bookId,
             @Parameter()
@@ -107,7 +109,7 @@ public class BookController {
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping(value = "/book-file/{bookId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/book-file/{bookId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(
             @NotNull @PathVariable("bookId") Integer bookId,
             @RequestPart("file") MultipartFile file,
@@ -116,14 +118,17 @@ public class BookController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/read/status/{bookId}")
+    public ResponseEntity<BookReadStatus> getReadingStatus(@PathVariable("bookId") Integer bookId, Authentication connectedUser) {
+        return ResponseEntity.ok(bookService.getReadingStatus(bookId, connectedUser));
+    }
+
     @GetMapping("/book-file/{bookId}")
-    public ResponseEntity<?> getFile(@PathVariable("bookId") Integer bookId, Authentication connectedUser) {
-                            byte[] file = bookService.getBookPDF(bookId, connectedUser);
-        if (file == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.status(HttpStatus.OK).
-                contentType(MediaType.APPLICATION_PDF)
-                .body(file);
+    public ResponseEntity<InputStreamResource> streamBookFile(@PathVariable("bookId") Integer bookId, Authentication connectedUser) {
+        InputStreamResource resource = bookService.streamBookFile(bookId, connectedUser);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=bookPDF.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(resource);
     }
 }

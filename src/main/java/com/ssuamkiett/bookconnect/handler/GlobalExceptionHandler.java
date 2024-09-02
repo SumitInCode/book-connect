@@ -17,6 +17,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 
 import static com.ssuamkiett.bookconnect.handler.ErrorCodes.*;
@@ -55,7 +56,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({OperationNotPermittedException.class})
     public ResponseEntity<ExceptionResponse> handleOperationNotPermittedException(OperationNotPermittedException ex) {
-        return buildResponse(null, ex.getMessage(), BAD_REQUEST);
+        return buildResponse(OPERATION_NOT_PERMITTED, ex.getMessage(), BAD_REQUEST);
     }
 
     @ExceptionHandler({EntityNotFoundException.class})
@@ -66,6 +67,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<ExceptionResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         return buildResponse(METHOD_NOT_ALLOWED, ex.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler({NoResourceFoundException.class})
+    public ResponseEntity<ExceptionResponse> handleInvalidApiPath(NoResourceFoundException ex) {
+        return buildResponse(METHOD_NOT_ALLOWED, ex.getMessage(), BAD_REQUEST);
     }
 
     @ExceptionHandler({WeakKeyException.class})

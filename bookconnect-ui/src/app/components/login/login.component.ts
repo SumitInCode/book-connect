@@ -34,13 +34,8 @@ export class LoginComponent {
           this.router.navigate(['/home']);
         },
         error: (error: any) => {
-          console.log(error)
-          if(error.status == 401) {
-            alert("UserName and Password is incorrect!!");
-          }
-          else {
-            alert("Internal server error!!");
-          }
+          console.log(error.error.errorDescription)
+          alert(error.error.errorDescription)
         }
       }
     );

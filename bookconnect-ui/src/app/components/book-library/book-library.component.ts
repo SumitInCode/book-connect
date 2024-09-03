@@ -78,8 +78,7 @@
           this.page++;
           this.isLoading = false;
         },
-        error: (error) => {
-          console.error('Failed to load books', error);
+        error: () => {
           this.isLoading = false;
         },
       });

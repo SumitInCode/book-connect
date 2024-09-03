@@ -1,5 +1,6 @@
 package com.ssuamkiett.bookconnect.book;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssuamkiett.bookconnect.common.BaseEntity;
 import com.ssuamkiett.bookconnect.feeback.Feedback;
 import com.ssuamkiett.bookconnect.history.BookReadingHistory;
@@ -24,6 +25,7 @@ public class Book extends BaseEntity {
     private String title;
     private String authorName;
     private String isbn;
+    @Column(length = 1000)
     private String synopsis;
     private String bookCover;
     private String bookPDF;
@@ -36,6 +38,7 @@ public class Book extends BaseEntity {
     @OneToMany(mappedBy = "book")
     private List<Feedback> feedbacks;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookReadingHistory> bookReadingHistories;
 

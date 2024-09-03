@@ -7,12 +7,12 @@ import java.util.Objects;
 
 @Service
 public class FeedbackMapper {
-    public Feedback toFeedback(FeedbackRequest feedbackRequest) {
+    public Feedback toFeedback(FeedbackRequest feedbackRequest, Integer bookId) {
         return Feedback.builder()
                 .note(feedbackRequest.note())
                 .comment(feedbackRequest.comment())
                 .book(Book.builder()
-                        .id(feedbackRequest.bookId())
+                        .id(bookId)
                         .build()
                 )
                 .build();
@@ -23,6 +23,9 @@ public class FeedbackMapper {
                 .note(feedback.getNote())
                 .comment(feedback.getComment())
                 .ownFeedback(Objects.equals(feedback.getCreatedBy(), id))
+                .userName(feedback.getUser().fullName())
+                .creationDate((feedback.getLastModifiedDate() == null) ?
+                                feedback.getCreationDate() : feedback.getLastModifiedDate())
                 .build();
     }
 }

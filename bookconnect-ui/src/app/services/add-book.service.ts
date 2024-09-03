@@ -16,6 +16,6 @@ export class AddBookService {
   }
 
   uploadBookFile(bookId: number, bookFileData: FormData) {
-    return this.http.post(this.UPLOAD_BOOK_FILE_URL + bookId, bookFileData);
+    return this.http.patch(this.UPLOAD_BOOK_FILE_URL + bookId, bookFileData);
   }
 } 

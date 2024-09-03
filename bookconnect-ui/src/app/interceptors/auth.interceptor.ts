@@ -1,32 +1,52 @@
+// auth.interceptor.ts
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
 import { inject } from '@angular/core';
-import { catchError, throwError } from 'rxjs';
-
+import { catchError, switchMap, throwError } from 'rxjs';
+import { environment } from '../../environment/environment';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const baseUrl = "http://localhost:8080/api/v1";
-  const authService = inject(AuthService);  
-  if (req.url === getFullUrl(authService.refreshUrl) || req.url === getFullUrl(authService.authUrl)) {
-    return next(req); 
-  }
+  const baseUrl = environment.apiBaseURL;
+  const authService = inject(AuthService);
+  const isAuthOrRefreshRequest = [
+    authService.refreshURL,
+    authService.authURL,
+  ].includes(req.url);
 
   const cloneRequest = req.clone({
-    url: getFullUrl(req.url),
-    setHeaders: {
-      Authorization: `Bearer ${authService.accesToken}`
-    }
+    url: getFullURL(req.url),
+    setHeaders: isAuthOrRefreshRequest
+      ? {}
+      : { Authorization: `Bearer ${authService.getAccessToken()}` },
   });
-  
+
+  if (req.url === authService.refreshURL || req.url === authService.authURL) {
+    return next(cloneRequest);
+  }
+
   return next(cloneRequest).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        authService.getAccessTokenFromAPI();
+      if (error.status === 403) {
+        return authService.requestAccessToken().pipe(
+          switchMap(() => {
+            return next(
+              req.clone({
+                url: getFullURL(req.url),
+                setHeaders: {
+                  Authorization: `Bearer ${authService.getAccessToken()}`,
+                },
+              })
+            );
+          }),
+          catchError((innerError) => {
+            return throwError(() => innerError);
+          })
+        );
       }
       return throwError(() => error);
     })
   );
 
-  function getFullUrl(subUrl: string): string {
-    return baseUrl.concat(subUrl);
+  function getFullURL(subUrl: string): string {
+    return baseUrl + subUrl;
   }
 };

@@ -1,8 +1,11 @@
 package com.ssuamkiett.bookconnect.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ssuamkiett.bookconnect.book.Book;
+import com.ssuamkiett.bookconnect.feeback.Feedback;
 import com.ssuamkiett.bookconnect.history.BookReadingHistory;
 import com.ssuamkiett.bookconnect.role.Role;
+import com.ssuamkiett.bookconnect.token.RefreshToken;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -50,8 +53,15 @@ public class User implements UserDetails, Principal {
     private List<Role> roles;
     @OneToMany(mappedBy = "owner")
     private List<Book> books;
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<BookReadingHistory> bookReadingHistories;
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> feedbacks;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

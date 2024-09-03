@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FeedbackComponent } from '../feedback/feedback.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookDetailsService } from '../../services/book-details.service';
@@ -20,18 +20,20 @@ export class BookDetailsPageComponent implements OnInit{
   private route = inject(ActivatedRoute);
   private bookDetailsService = inject(BookDetailsService)
   private router = inject(Router);
-
+  bookId: number | undefined;
   constructor(private authContextService: AuthContextService) {
     this.authContextService.getAuthenticationStatus().subscribe(status => {
       this.isAuthenticated = status;
     })
   }
+
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
+      this.bookId = +params.get('id')!;
       if(this.isAuthenticated) {
-        this.getBookReadingStatus(+params.get('id')!);
+        this.getBookReadingStatus(this.bookId);
       }
-      this.getBook(+params.get('id')!);
+      this.getBook(this.bookId);
     })
   }
 
@@ -39,11 +41,6 @@ export class BookDetailsPageComponent implements OnInit{
     this.bookDetailsService.getBook(bookId).subscribe({
       next: (response: any) => {
         this.book = response;
-      },
-      complete: () => {
-      },
-      error: (error: any) => {
-        console.error('Failed to load books', error);
       },
     });
   }
@@ -57,12 +54,7 @@ export class BookDetailsPageComponent implements OnInit{
     this.bookDetailsService.deleteBook(bookId).subscribe({
       next: () => {
         this.router.navigate(['/my-books']);
-      },
-      complete: () => {
-      },                                                                  
-      error: (error: any) => {
-        console.error('Failed to load books', error);
-      },
+      },                                                            
     });
   }
 
@@ -74,13 +66,7 @@ export class BookDetailsPageComponent implements OnInit{
     this.bookDetailsService.addToReadBook(bookId).subscribe({
       next: () => {
         this.router.navigate(['/book-shelf']);
-      },
-      complete: () => {
-      },
-      error: (error: any) => {
-        alert(error.error.errorDescription)
-        console.error('Failed to load books', error.error.errorDescription);
-      },
+      },      
     });
   }
 
@@ -93,14 +79,25 @@ export class BookDetailsPageComponent implements OnInit{
       next: (response) => {
         this.readStatus = response.reading;
       },
-      error: (error: any) => {
-        alert("Server Error")
-      },
     });
   }
 
   readBook(bookId: number) {
     this.router.navigate(['/reader', bookId]);
+  }
+
+  getStars(rating: number): number[] {
+    return Array(rating).fill(1);
+  }
+
+  getEmptyStar(rate: number) {
+    /*
+      I don't know why i have to convert to Number type 
+      it not working with number type its giving Error 
+      saying Array len is not valid;
+    */
+    let len: Number  = new Number(5 - Math.min(rate, 5));
+    return Array(len).fill(1);
   }
 }
 

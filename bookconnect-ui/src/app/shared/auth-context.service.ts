@@ -12,7 +12,7 @@ export class AuthContextService {
     return this.isAuthenticated.asObservable();
   }
 
-  public setAuthenticationstatus(status: boolean) {
+  public setAuthenticationStatus(status: boolean) {
     this.isAuthenticated.next(status);
   }
 }

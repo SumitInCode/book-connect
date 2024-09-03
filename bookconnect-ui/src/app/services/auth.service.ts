@@ -1,102 +1,98 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Subject, tap, Observable, race } from 'rxjs';
-import { AuthContextService } from '../shared/auth-context.service';
+  // auth.service.ts
+  import { HttpClient, HttpHeaders } from '@angular/common/http';
+  import { Injectable, inject } from '@angular/core';
+  import { Observable, tap, switchMap, catchError, of } from 'rxjs';
+  import { AuthContextService } from '../shared/auth-context.service';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthService {
-  authUrl: string = '/auth/authenticate';
-  refreshUrl: string = '/auth/refresh-token';
-  accesToken: string = "";
+  @Injectable({
+    providedIn: 'root',
+  })
+  export class AuthService {
+    private SEVEN_DAYS_IN_MS: number = 604800000;
+    authURL = '/auth/authenticate';
+    refreshURL = '/auth/refresh-token';
+    private accessToken: string = '';
+    private authContextService = inject(AuthContextService);
 
-  private authContextService = inject(AuthContextService);
+    constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) {
-  }
-
-  onLogin(loginData: any): Observable<any> {
-    return this.http.post<any>(this.authUrl, loginData).pipe( 
-      tap((response) => {
-        this.accesToken = response.accessToken;
-        this.saveToken(response.refreshToken, response.accessToken, new Date(new Date().setDate(new Date().getDate() + 7)));
-        this.authContextService.setAuthenticationstatus(true);
-      })
-    );
-  }
-
-  onLogout() {
-    this.deleteToken();
-    this.authContextService.setAuthenticationstatus(false);
-  }
-
-  autoLogin() {
-    let expirationTime = this.getExpiration();
-    if(expirationTime && (new Date() > new Date(expirationTime)))  {
-      return;
+    onLogin(loginData: any): Observable<any> {
+      return this.http.post<any>(this.authURL, loginData).pipe(
+        tap((response) => {
+          console.log(response.accessToken, response.refreshToken);
+          this.accessToken = response.accessToken;
+          this.saveToken(
+            response.refreshToken,
+            response.accessToken,
+            new Date(Date.now() + this.SEVEN_DAYS_IN_MS)
+          );
+          this.authContextService.setAuthenticationStatus(true);
+        })
+      );
     }
-    console.log("here 1")
-    let accessToken = this.getAccessTokenFromLocalStorage()
-    if(accessToken) {
-      this.accesToken = accessToken;
-      this.authContextService.setAuthenticationstatus(true)
-      return;
+
+    onLogout(): void {
+      this.deleteToken();
+      this.authContextService.setAuthenticationStatus(false);
     }
-    console.log("here 2")
-    let refreshToken = this.getRefreshTokenLocalStorage();
-    if(refreshToken) {
-      this.requestAccessToken(refreshToken);
+
+    autoLogin(): void {
+      const expirationTime = this.getExpiration();
+      if (expirationTime && new Date() > new Date(expirationTime)) {
+        return;
+      }
+      const accessToken = this.getAccessTokenFromLocalStorage();
+      if (accessToken) {
+        this.accessToken = accessToken;
+        this.authContextService.setAuthenticationStatus(true);
+        return;
+      }
+      const refreshToken = this.getRefreshTokenFromLocalStorage();
+      if (refreshToken) {
+        this.requestAccessToken().subscribe();
+      }
+    }
+
+    saveToken(
+      refreshToken: string | null,
+      accessToken: string | null,
+      expirationDate: Date | null
+    ): void {
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+      if (accessToken) localStorage.setItem('accessToken', accessToken);
+      if (expirationDate)
+        localStorage.setItem('expirationDate', JSON.stringify(expirationDate));
+    }
+
+    deleteToken(): void {
+      localStorage.clear();
+    }
+
+    getExpiration(): string | null {
+      return localStorage.getItem('expirationDate');
+    }
+
+    getRefreshTokenFromLocalStorage(): string | null {
+      return localStorage.getItem('refreshToken');
+    }
+
+    getAccessTokenFromLocalStorage(): string | null {
+      return localStorage.getItem('accessToken');
+    }
+
+    requestAccessToken(): Observable<any> {
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${this.getRefreshTokenFromLocalStorage()}`,
+      });
+      return this.http.post<any>(this.refreshURL, {}, { headers }).pipe(
+        tap((response) => {
+          this.accessToken = response.accessToken;
+          this.saveToken(null, response.accessToken, null);
+        }),
+      );
+    }
+
+    getAccessToken(): string {
+      return this.accessToken;
     }
   }
-
-  saveToken(refreshToken: string | null, accessToken: string | null, expirationDate: Date | null) {
-    if(refreshToken) {
-      localStorage.setItem("refreshToken", refreshToken);
-    }
-    if(accessToken) {
-      localStorage.setItem('accessToken', accessToken);
-    }
-    if(expirationDate) {
-      localStorage.setItem('expirationDate', JSON.stringify(expirationDate));
-    }
-  }
-
-  deleteToken() {
-    localStorage.clear();
-  }
-
-  getExpiration(): string | null {
-   return localStorage.getItem('expirationDate');
-  }
-
-  getRefreshTokenLocalStorage(): string | null{
-    return localStorage.getItem('refreshToken');
-  }
-
-  getAccessTokenFromLocalStorage(): string | null{
-    return localStorage.getItem('accessToken');
-  }
-
-  getAccessTokenFromAPI() {
-    let refreshToken = localStorage.getItem('refreshToken');
-    if(refreshToken) {
-      this.requestAccessToken(refreshToken);
-    }
-    this.authContextService.setAuthenticationstatus(true);
-  }
-
-  requestAccessToken(refreshToken: string) {
-    const headers = { Authorization: `Bearer ${refreshToken}` }
-    this.http
-      .post(`http://localhost:8080/api/v1${this.refreshUrl}`, {}, {headers})
-      .subscribe({
-        next: (response: any) => {
-          this.accesToken = response.accessToken;
-          this.saveToken(response.accessToken, null, null);
-        },
-        complete: () => {
-        }
-    });
-  }
-}

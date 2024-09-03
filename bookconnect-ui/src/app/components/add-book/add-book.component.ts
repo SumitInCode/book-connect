@@ -86,7 +86,7 @@ export class AddBookComponent {
         'coverPhoto',
         this.coverPhotoInput.nativeElement.files[0]
       );
-    }      
+    }     
     this.createBook(formData);
   }
 

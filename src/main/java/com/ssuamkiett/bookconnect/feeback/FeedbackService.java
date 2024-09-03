@@ -22,8 +22,9 @@ public class FeedbackService {
     private final BookRepository bookRepository;
     private final FeedbackMapper feedbackMapper;
     private final FeedbackRepository feedbackRepository;
-    public Integer save(FeedbackRequest feedbackRequest, Authentication connectedUser) {
-        Book book = bookRepository.findById(feedbackRequest.bookId()).orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + feedbackRequest.bookId()));
+    public Integer save(Integer bookId, FeedbackRequest feedbackRequest, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("You cannot give a feedback for an archived or not shareable book");
         }
@@ -31,7 +32,8 @@ public class FeedbackService {
         if(Objects.equals(book.getOwner().getId(), user.getId())) {
             throw new OperationNotPermittedException("You cannot give a feedback to your own book");
         }
-        Feedback feedback = feedbackMapper.toFeedback(feedbackRequest);
+        Feedback feedback = feedbackMapper.toFeedback(feedbackRequest, bookId);
+        feedback.setUser(user);
         return feedbackRepository.save(feedback).getId();
     }
 
@@ -51,5 +53,15 @@ public class FeedbackService {
                 feedbacks.isFirst(),
                 feedbacks.isLast()
         );
+    }
+
+    public void deleteFeedback(Integer bookId, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
+        if(book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("You cannot give a feedback for an archived or not shareable book");
+        }
+        User user = (User) connectedUser.getPrincipal();
+        feedbackRepository.deleteByBookIdAndCreatedBy(bookId, user.getId());
     }
 }

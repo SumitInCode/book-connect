@@ -323,3 +323,14 @@ h1 em {
   padding-top: 20px;
   margin: 1.5em auto;
 }
+
+/* app.component.css */
+.rating-star {
+  font-size: 18px; /* Size of stars */
+  cursor: pointer;
+  color: #d3d3d3; /* Default color for unselected stars */
+}
+
+.rating-star.selected {
+  color: #ffcc00; /* Color for selected stars */
+}

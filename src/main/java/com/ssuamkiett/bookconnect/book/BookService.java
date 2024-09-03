@@ -219,13 +219,16 @@ public class BookService {
         Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
         if(Objects.equals(book.getOwner().getId(), user.getId())) {
-            storageService.readFileFromLocation(book.getBookPDF());
-        }
+           return getStreamBookFile(book);
+        }   
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("Operation not permitted to retrieve book");
 
         }
+        return getStreamBookFile(book);
+    }
 
+    private InputStreamResource getStreamBookFile(Book book) {
         try {
             FileInputStream resource = new FileInputStream(book.getBookPDF());
             return new InputStreamResource(resource);

@@ -15,20 +15,30 @@ import org.springframework.web.bind.annotation.*;
 public class FeedbackController {
     private final FeedbackService feedbackService;
 
-    @PostMapping
+    @PostMapping("/{bookId}")
     public ResponseEntity<Integer> saveFeedback(
+            @PathVariable("bookId") Integer bookId,
             @Valid @RequestBody FeedbackRequest feedbackRequest,
             Authentication connectedUser) {
-        return ResponseEntity.ok(feedbackService.save(feedbackRequest, connectedUser));
+        return ResponseEntity.ok(feedbackService.save(bookId, feedbackRequest, connectedUser));
     }
 
-    @GetMapping("/books/{book-id}")
+    @GetMapping("/{bookId}")
     public ResponseEntity<PageResponse<FeedbackResponse>> findAllFeedbacksByBook(
-            @PathVariable("book-id") Integer bookId,
+            @PathVariable("bookId") Integer bookId,
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size,
             Authentication connectedUser
     ) {
         return ResponseEntity.ok(feedbackService.findAllFeedbacksByBook(bookId, page, size, connectedUser));
+    }
+
+    @DeleteMapping("delete/{bookId}")
+    public ResponseEntity<?> deleteFeedback(
+            @PathVariable("bookId") Integer bookId,
+            Authentication connectedUser
+    ) {
+        feedbackService.deleteFeedback(bookId, connectedUser);
+        return ResponseEntity.ok().build();
     }
 }

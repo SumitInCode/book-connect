@@ -1,119 +1,43 @@
-  <div class="comment-section">
-    <div class="eight book-heading ">
-      <h1>FEEDBACKS</h1>
-    </div>
-    <div class="comments-wrp">
-      <!-- Comment 1 -->
-      <div class="comment-wrp">
-        <div class="comment container">
-          <div class="c-controls">
-            <span class="material-symbols-outlined control-icon"> delete </span>
-            <span class="material-symbols-outlined control-icon"> edit </span>
-          </div>
-          <div class="c-user">
-            <p class="usr-name">amyrobson</p>
-            <p class="cmnt-at">1 month ago</p>
-          </div>
-          <div class="comment-rating">
-            <span class="rating-star">★</span>
-            <span class="rating-star">★</span>
-            <span class="rating-star">★</span>
-            <span class="rating-star">★</span>
-            <span class="rating-star">☆</span>
-          </div>  
-          <p class="c-text">
-            <span class="c-body"
-              >Impressive! Though it seems the drag feature could be improved. But
-              overall it looks incredible. You've nailed the design and the
-              responsiveness at various breakpoints works really well.</span
-            >
-          </p>
+<!-- feedback.component.html -->
+<div class="comment-section">
+  <div class="eight book-heading">
+    <h1>FEEDBACKS</h1>
+  </div>
+  <div class="comments-wrp">
+    <!-- Loop through feedback list -->
+    <div class="comment-wrp" *ngFor="let feedback of feedbacks">
+      <div class="comment container">
+        <div class="c-controls" *ngIf="feedback.ownFeedback">
+          <span *ngIf="feedback.isOwnerOfBook" class="material-symbols-outlined control-icon" (click)="delete()">delete</span>
         </div>
-      </div>
-
-      <!-- Comment 2 -->
-      <div class="comment-wrp">
-        <div class="comment container"> 
-          <div class="c-controls">
-            <span class="material-symbols-outlined control-icon"> delete </span>
-            <span class="material-symbols-outlined control-icon"> edit </span>
-          </div>
-          <div class="c-user">
-            <p class="usr-name">maxblagun</p>
-            <p class="cmnt-at">2 weeks ago</p>
-          </div>
-          <div class="comment-rating">
-            <span class="rating-star">★</span>
-            <span class="rating-star">★</span>
-            <span class="rating-star">★</span>
-            <span class="rating-star">★</span>
-            <span class="rating-star">☆</span>
-          </div>
-          <p class="c-text">
-            <span class="c-body"
-              >Woah, your project looks awesome! How long have you been coding
-              for? I'm still new, but think I want to dive into React as well
-              soon. Perhaps you can give me an insight on where I can learn React?
-              Thanks!</span
-            >
-          </p>
-
-          <!-- Reply 1 -->
-          <!-- <div class="comment-wrp replies">
-            <div class="comment container">
-              <div class="c-controls">
-                <a class="delete"
-                  ><span class="material-symbols-outlined control-icon">
-                    delete </span
-                  >Delete</a
-                >
-                <a class="edit"
-                  ><span class="material-symbols-outlined control-icon">
-                    edit </span
-                  >Edit</a
-                >
-              </div>
-              <div class="c-user">
-                <p class="usr-name">ramsesmiron</p>
-                <p class="cmnt-at">1 week ago</p>
-              </div>
-              <p class="c-text">
-                <span class="c-body"
-                  >If you're still new, I'd recommend focusing on the fundamentals
-                  of HTML, CSS, and JS before considering Angular. It's very
-                  tempting to jump ahead but lay a solid foundation first.</span
-                >
-              </p>
-            </div>
-          </div> -->
+        <div class="c-user">
+          <p class="usr-name">{{ feedback.userName }}</p>
+          <p class="cmnt-at">{{ feedback.creationDate }}</p>
         </div>
+        <div class="comment-rating">
+          <span class="rating-star" *ngFor="let star of getStars(feedback.note)">★</span>
+          <span class="rating-star" *ngFor="let star of getEmptyStars(feedback.note)">☆</span>
+        </div>  
+        <p class="c-text">
+          <span class="c-body">{{ feedback.comment }}</span>
+        </p>
       </div>
-    </div>
-    <div>
-        <div class="reply-input">
-          <div class="rating-input">
-            <span class="rating-star" data-value="1">☆</span>
-            <span class="rating-star" data-value="2">☆</span>
-            <span class="rating-star" data-value="3">☆</span>
-            <span class="rating-star" data-value="4">☆</span>
-            <span class="rating-star" data-value="5">☆</span>
-          </div>
-          <textarea class="cmnt-input" placeholder="Add a comment..."></textarea>
-          <button class="bu-primary">SEND</button>
-        </div>
-      </div>
-    </div>
-
-
-  <!-- Modal -->
-  <div class="modal-wrp">
-    <div class="modal container">
-      <h3>Delete comment</h3>
-      <p>
-        Are you sure you want to delete this comment? This will remove the comment
-        and can't be undone.
-      </p>
-      <button class="yes">YES, DELETE</button>
-      <button class="no">NO, CANCEL</button>
     </div>
   </div>
+
+  <!-- Reply Input -->
+  <div class="reply-input">
+    <div class="rating-input">
+      <span 
+        *ngFor="let star of stars; let i = index" 
+        class="rating-star" 
+        [class.selected]="i < currentRating"
+        (click)="setRating(i + 1)"
+      >
+        ☆
+      </span>
+    </div>
+    <textarea class="cmnt-input" (input)="onCommentChange($event)" placeholder="Add a comment..."></textarea>
+    <button class="bu-primary" (click)="postComment()">SEND</button>
+  </div>
+</div>

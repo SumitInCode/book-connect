@@ -8,17 +8,15 @@
   <div class="book-details">
     <h1 class="book-title">{{book.title}}</h1>
     <div class="book-rating">
-      <span class="star">★</span>
-      <span class="star">★</span>
-      <span class="star">★</span>
-      <span class="star">★</span>
-      <span>☆</span>
+      <span class="ratedstar" *ngFor="let rating-star of getStars(book.rate)" >★</span>
+      <span class="star" *ngFor="let emptystar of getEmptyStar(book.rate)" >☆</span>
+      <!-- <span class="rating-star" *ngFor="let star of getStars(feedback.note)">★</span> -->
       <span class="rating-text"> ({{book.rate }}/5)</span>
     </div>
     <p><strong>Author: </strong>{{ book.authorName }}</p>
     <p><strong>ISBN: </strong>{{ book.isbn }}</p>
     <p>
-      <strong>Genre: </strong><span class="book-genre">genre</span>
+      <strong>Genre: </strong><span class="book-genre"> {{ book.genre   }}</span>
     </p>
     <p class="book-synposis-content">
       <strong>Synopsis:</strong>
@@ -31,4 +29,4 @@
   </div>
 </div>
 
-<app-feedback></app-feedback>
+<app-feedback [bookId]="bookId"></app-feedback>

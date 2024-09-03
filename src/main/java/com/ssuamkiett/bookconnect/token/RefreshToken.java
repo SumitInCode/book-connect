@@ -1,5 +1,6 @@
 package com.ssuamkiett.bookconnect.token;
 
+import com.ssuamkiett.bookconnect.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,8 +24,7 @@ public class RefreshToken {
     private LocalDateTime createdAt;
     @Column(nullable = false)
     private LocalDateTime expiresAt;
-
-//    @ManyToOne
-//    @JoinColumn(name = "userId", nullable = false)
-//    private User user;
+    @OneToOne
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
 }

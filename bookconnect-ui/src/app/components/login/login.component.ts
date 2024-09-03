@@ -30,7 +30,7 @@ export class LoginComponent {
     this.authService.onLogin(loginData).subscribe(
       {
         complete:  () => {
-          this.authContext.setAuthenticationstatus(true);
+          this.authContext.setAuthenticationStatus(true);
           this.router.navigate(['/home']);
         },
         error: (error: any) => {

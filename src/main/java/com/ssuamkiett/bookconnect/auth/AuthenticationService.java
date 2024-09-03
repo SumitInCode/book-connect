@@ -76,7 +76,8 @@ public class AuthenticationService {
             if (userEmail == null || !isValidToken(refreshToken, userEmail)) {
                 throw new OperationNotPermittedException("Invalid refresh token");
             }
-        } catch (JwtException e) {
+        }
+        catch (JwtException e) {
             throw new OperationNotPermittedException("Error while validating token");
         }
 
@@ -114,8 +115,8 @@ public class AuthenticationService {
         refreshTokenEntity.setToken(refreshToken);
         refreshTokenEntity.setCreatedAt(LocalDateTime.now());
         refreshTokenEntity.setExpiresAt(LocalDateTime.now().plusDays(REFRESH_TOKEN_VALIDITY_DAYS));
+        refreshTokenEntity.setUser(user);
         refreshTokenRepository.save(refreshTokenEntity);
-
         return refreshToken;
     }
 

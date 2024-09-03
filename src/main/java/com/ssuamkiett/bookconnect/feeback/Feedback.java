@@ -2,6 +2,7 @@ package com.ssuamkiett.bookconnect.feeback;
 
 import com.ssuamkiett.bookconnect.book.Book;
 import com.ssuamkiett.bookconnect.common.BaseEntity;
+import com.ssuamkiett.bookconnect.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,4 +24,7 @@ public class Feedback extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

@@ -10,7 +10,7 @@ import { AuthContextService } from '../../shared/auth-context.service';
   standalone: true,
   imports: [RouterModule, FormsModule, CommonModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'], // Changed from styleUrl to styleUrls
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
   authService = inject(AuthService);
@@ -34,7 +34,6 @@ export class LoginComponent {
           this.router.navigate(['/home']);
         },
         error: (error: any) => {
-          console.log(error.error.errorDescription)
           alert(error.error.errorDescription)
         }
       }

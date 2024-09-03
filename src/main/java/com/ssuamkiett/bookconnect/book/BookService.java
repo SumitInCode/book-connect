@@ -85,39 +85,19 @@ public class BookService {
 
     public PageResponse<BookResponse> findAllBooks(int page, int size, Authentication connectedUser) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("creationDate").descending());
-        if(connectedUser == null) {
-            return findAllBooks(pageable);
-        }
-        User user = (User) connectedUser.getPrincipal();
-        Page<Book> books = bookRepository.findAllDisplayableBooks(pageable, user.getId());
+        Page<Book> books = getAllBooks(pageable, connectedUser);
         List<BookResponse> bookResponse = books.stream()
                 .map(bookMapper::toBookResponse)
                 .toList();
-        return new PageResponse<>(
-                bookResponse,
-                books.getNumber(),
-                books.getSize(),
-                books.getTotalElements(),
-                books.getTotalPages(),
-                books.isFirst(),
-                books.isLast()
-        );
+        return buildPageResponse(books, bookResponse);
     }
 
-    private PageResponse<BookResponse> findAllBooks(Pageable pageable) {
-        Page<Book> books = bookRepository.findAllDisplayableBooks(pageable);
-        List<BookResponse> bookResponse = books.stream()
-                .map(bookMapper::toBookResponse)
-                .toList();
-        return new PageResponse<>(
-                bookResponse,
-                books.getNumber(),
-                books.getSize(),
-                books.getTotalElements(),
-                books.getTotalPages(),
-                books.isFirst(),
-                books.isLast()
-        );
+    private Page<Book> getAllBooks(Pageable pageable, Authentication connectedUser) {
+        if (connectedUser == null) {
+            return bookRepository.findAllDisplayableBooks(pageable);
+        }
+        User user = (User) connectedUser.getPrincipal();
+        return bookRepository.findAllDisplayableBooks(pageable, user.getId());
     }
 
     public PageResponse<BookResponse> findAllBooksByOwner(int page, int size, Authentication connectedUser) {
@@ -127,15 +107,7 @@ public class BookService {
         List<BookResponse> bookResponse = books.stream()
                 .map(bookMapper::toBookResponse)
                 .toList();
-        return new PageResponse<>(
-                bookResponse,
-                books.getNumber(),
-                books.getSize(),
-                books.getTotalElements(),
-                books.getTotalPages(),
-                books.isFirst(),
-                books.isLast()
-        );
+        return buildPageResponse(books, bookResponse);
     }
     public void addReadBook(Integer bookId, Authentication connectedUser) {
         Book book = getBookFromDB(bookId);
@@ -198,11 +170,6 @@ public class BookService {
         bookRepository.delete(book);
     }
 
-    private Book getBookFromDB(Integer bookId) {
-        return bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
-    }
-
     public void uploadBookPDF(MultipartFile file, Integer bookId, Authentication connectedUser) {
         Book book = getBookFromDB(bookId);
         User user = (User) connectedUser.getPrincipal();
@@ -220,7 +187,7 @@ public class BookService {
         User user = (User) connectedUser.getPrincipal();
         if(Objects.equals(book.getOwner().getId(), user.getId())) {
            return getStreamBookFile(book);
-        }   
+        }
         if(book.isArchived() || !book.isShareable()) {
             throw new OperationNotPermittedException("Operation not permitted to retrieve book");
 
@@ -245,8 +212,37 @@ public class BookService {
         List<BookResponse> bookResponse = books.stream()
                 .map(bookMapper::toBookResponse)
                 .toList();
+        return buildPageResponse(books, bookResponse);
+    }
+
+    public BookReadStatus getReadingStatus(Integer bookId, Authentication connectedUser) {
+        User user = (User) connectedUser.getPrincipal();
+        return bookReadingHistoryService.getReadingStatus(user.getId(), bookId);
+    }
+
+    public PageResponse<BookResponse> findAllPopularBooks(int page, int size, Authentication connectedUser) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("creationDate").descending());
+
+        Page<Book> books = getPopularBooks(pageable, connectedUser);
+
+        List<BookResponse> bookResponses = books.stream()
+                .map(bookMapper::toBookResponse)
+                .toList();
+
+        return buildPageResponse(books, bookResponses);
+    }
+
+    private Page<Book> getPopularBooks(Pageable pageable, Authentication connectedUser) {
+        if (connectedUser == null) {
+            return bookRepository.findPopularBooks(pageable);
+        }
+        User user = (User) connectedUser.getPrincipal();
+        return bookRepository.findPopularBooks(pageable, user.getId());
+    }
+
+    private PageResponse<BookResponse> buildPageResponse(Page<Book> books, List<BookResponse> bookResponses) {
         return new PageResponse<>(
-                bookResponse,
+                bookResponses,
                 books.getNumber(),
                 books.getSize(),
                 books.getTotalElements(),
@@ -256,8 +252,8 @@ public class BookService {
         );
     }
 
-    public BookReadStatus getReadingStatus(Integer bookId, Authentication connectedUser) {
-        User user = (User) connectedUser.getPrincipal();
-        return bookReadingHistoryService.getReadingStatus(user.getId(), bookId);
+    private Book getBookFromDB(Integer bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with the ID : " + bookId));
     }
 }

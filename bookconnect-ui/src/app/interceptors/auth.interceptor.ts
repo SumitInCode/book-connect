@@ -5,7 +5,7 @@ import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environment/environment';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const baseUrl = environment.apiBaseURL;
+  const baseURL = environment.apiBaseURL;
   const authService = inject(AuthService);
   const isAuthOrRefreshRequest = [
     authService.refreshURL,
@@ -46,7 +46,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 
-  function getFullURL(subUrl: string): string {
-    return baseUrl + subUrl;
+  function getFullURL(SubURL: string): string {
+    return baseURL + SubURL;
   }
 };

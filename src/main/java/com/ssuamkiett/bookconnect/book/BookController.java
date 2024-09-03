@@ -50,6 +50,14 @@ public class BookController {
         return ResponseEntity.ok(bookService.findAllBooks(page, size, connectUser));
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<PageResponse<BookResponse>> findAllPopularBooks(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size,
+            Authentication connectUser) {
+        return ResponseEntity.ok(bookService.findAllPopularBooks(page, size, connectUser));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<PageResponse<BookResponse>> findAllBooksByTitle(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,

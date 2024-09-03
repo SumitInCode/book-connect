@@ -30,6 +30,7 @@ public class SecurityConfig {
                                         "api/v1/books",
                                         "/api/v1/books/search",
                                         "api/v1/books/book/*",
+                                        "api/v1/books/popular",
                                         "/v3/api-docs/**",
                                         "/configuration/ui/**",
                                         "/swagger-resources/**",

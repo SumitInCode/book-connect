@@ -41,7 +41,6 @@
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Failed to load books', error);
           this.isLoading = false;
         },
       });

@@ -25,4 +25,27 @@ public interface BookRepository extends JpaRepository<Book, Integer>, JpaSpecifi
                   AND book.shareable = true
             """)
     Page<Book> findAllDisplayableBooks(Pageable pageable);
+
+    @Query("""
+                 SELECT book
+                 FROM Book book
+                 LEFT JOIN book.feedbacks feedback
+                 WHERE book.archived = false
+                 AND book.shareable = true
+                 GROUP BY book
+                 ORDER BY COUNT(feedback) DESC
+            """)
+    Page<Book> findPopularBooks(Pageable pageable);
+
+    @Query("""
+                 SELECT book
+                 FROM Book book
+                 LEFT JOIN book.feedbacks feedback
+                 WHERE book.archived = false
+                 AND book.shareable = true
+                 AND book.owner.id != :userId
+                 GROUP BY book
+                 ORDER BY COUNT(feedback) DESC
+            """)
+    Page<Book> findPopularBooks(Pageable pageable, Integer userId);
 }

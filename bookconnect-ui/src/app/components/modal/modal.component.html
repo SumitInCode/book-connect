@@ -1,0 +1,14 @@
+<!-- modal.component.html -->
+<div class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-body">
+      <p *ngIf="!showError">Are you sure want to proceed?</p>
+      <P>{{ errorMessage }}</P>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" (click)= "onCancel()"> {{ (showError) ? "Close" : "Cancel" }}</button>
+      <button *ngIf="!showError" class="btn" (click)= "onConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>
+

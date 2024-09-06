@@ -1,7 +1,7 @@
-<app-search-form (search)="handleSearch($event)" (clear)="onClear()"></app-search-form>   
+<app-search-form (search)="handleSearch($event)" (clear)="onClear()"></app-search-form>
 <app-booklist [books]="books"></app-booklist>
 <div *ngIf="hashMoreBooks" class="btn-container">
-  <button class="btn" (click)= "handleLoadMore()" [disabled]="isLoading">
-    Load More
-  </button>
+    <button class="btn" (click)= "handleLoadMore()" [disabled]="isLoading">
+      Load More
+    </button>
 </div>

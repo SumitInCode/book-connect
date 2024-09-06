@@ -1,50 +1,59 @@
 <div class="comp-container">
-    <div class="login-container">
-      <h2 class="form-title">Log In</h2>
-      <form #f="ngForm" class="login-form" (ngSubmit)="onSubmit(f)">
-        <div class="input-wrapper">
-          <input
-            type="text"
-            name="email"
-            placeholder="Email address"
-            class="input-field"
-            ngModel
-            #email="ngModel"
-            required
-            email
-            autocomplete="username"
-          />
-          <span class="material-symbols-outlined login-icons" [ngClass]="{'login-icons-alert': email.touched && email.invalid}">mail</span>
-          <span *ngIf="email.touched && email.invalid" class="alert">
+  <div class="login-container">
+    <h2 class="form-title">Log In</h2>
+    <form #f="ngForm" class="login-form" (ngSubmit)="onSubmit(f)">
+      <div class="input-wrapper">
+        <input
+          type="text"
+          name="email"
+          placeholder="Email address"
+          class="input-field"
+          ngModel
+          #email="ngModel"
+          required
+          email
+          autocomplete="username"
+        />
+        <span class="material-symbols-outlined login-icons"
+              [ngClass]="{'login-icons-alert': email.touched && email.invalid}">mail</span>
+        <span *ngIf="email.touched && email.invalid" class="alert">
             <ng-container *ngIf="email.errors?.['required']">Email is required.</ng-container>
             <ng-container *ngIf="email.errors?.['email']">Invalid email format ex: user&#64;mail.com.</ng-container>
           </span>
-        </div>
-  
-        <div class="input-wrapper">
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            class="input-field"
-            ngModel
-            #password="ngModel"
-            required
-            minlength="8"
-            autocomplete="new-password"
-          />
-          <span class="material-symbols-outlined login-icons" [ngClass]="{'login-icons-alert': password.touched && password.invalid}">lock</span>
-          <span *ngIf="password.touched && password.invalid" class="alert">
+      </div>
+
+      <div class="input-wrapper">
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          class="input-field"
+          ngModel
+          #password="ngModel"
+          required
+          minlength="8"
+          autocomplete="new-password"
+        />
+        <span class="material-symbols-outlined login-icons"
+              [ngClass]="{'login-icons-alert': password.touched && password.invalid}">lock</span>
+        <span *ngIf="password.touched && password.invalid" class="alert">
             <ng-container *ngIf="password.errors?.['required']">Password is required.</ng-container>
-            <ng-container *ngIf="password.errors?.['minlength']">Password must be greater than 8 characters.</ng-container>
+            <ng-container
+              *ngIf="password.errors?.['minlength']">Password must be greater than 8 characters.</ng-container>
           </span>
-        </div>
-        <button type="submit" class="login-btn" [disabled]="f.invalid">Log In</button>
-        <p class="signup-text">
-          Don&apos;t have an account? 
-          <a [routerLink]="['/get-started']" class="forgot-pass-link">Not a user?</a>
-        </p>
-      </form>
-    </div>
+      </div>
+      <button type="submit" class="login-btn" [disabled]="f.invalid">Log In</button>
+      <p class="signup-text">
+        Don&apos;t have an account?
+        <a [routerLink]="['/get-started']" class="forgot-pass-link">Not a user?</a>
+      </p>
+    </form>
   </div>
-  
+</div>
+
+
+<app-modal *ngIf="isError"
+           [showError]="isError"
+           [errorMessage]="errorMsg"
+           (cancel)="onClose()">
+</app-modal>
